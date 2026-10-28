@@ -1,4 +1,28 @@
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
+
+// إعدادات Firebase الخاصة بمشروع Velora
+const firebaseConfig = {
+  apiKey: "AIzaSyC3cGX_eZXa11EbOrHtsS7KwMi_FZYnUT4",
+  authDomain: "velora-89ee1.firebaseapp.com",
+  projectId: "velora-89ee1",
+  storageBucket: "velora-89ee1.firebasestorage.app",
+  messagingSenderId: "844313456077",
+  appId: "1:844313456077:web:2a52c2006548f5ae892884",
+  measurementId: "G-Q9CRKMTGWX"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// القوالب
 const templates = [
   {
     id: 1,
@@ -56,15 +80,19 @@ const templates = [
   }
 ];
 
-// عناصر الصفحة
 const grid = document.getElementById("templateGrid");
 const searchInput = document.getElementById("searchInput");
 const count = document.getElementById("templateCount");
+const modal = document.getElementById("requestModal");
+const requestForm = document.getElementById("requestForm");
+const requestResult = document.getElementById("requestResult");
 
 let currentCategory = "all";
 
 // عرض القوالب
 function renderTemplates() {
+  if (!grid || !searchInput || !count) return;
+
   const query = searchInput.value.trim().toLowerCase();
 
   const filtered = templates.filter(item => {
@@ -79,8 +107,7 @@ function renderTemplates() {
     return categoryMatch && searchText.includes(query);
   });
 
-  count.textContent =
-    `${String(filtered.length).padStart(2, "0")} قوالب`;
+  count.textContent = `${filtered.length} قوالب`;
 
   if (filtered.length === 0) {
     grid.innerHTML = "<p>ما لقينا قوالب مطابقة لبحثك.</p>";
@@ -107,15 +134,20 @@ function renderTemplates() {
         <p>${item.description}</p>
 
         <div class="card-actions">
-          <button
-            class="btn btn-dark"
-            onclick="openForm('${item.id}')">
+          <button type="button" class="btn btn-dark"
+            data-template-id="${item.id}">
             اطلبي هذا القالب ↗
           </button>
         </div>
       </div>
     </article>
   `).join("");
+
+  grid.querySelectorAll("[data-template-id]").forEach(button => {
+    button.addEventListener("click", () => {
+      openForm(button.dataset.templateId);
+    });
+  });
 }
 
 // تصنيفات القوالب
@@ -126,75 +158,115 @@ document.querySelectorAll(".filter").forEach(button => {
 
     button.classList.add("active");
     currentCategory = button.dataset.category;
-
     renderTemplates();
   });
 });
 
-// البحث
-searchInput.addEventListener("input", renderTemplates);
+searchInput?.addEventListener("input", renderTemplates);
 
 // فتح نموذج الطلب
 function openForm(templateId = "") {
-  document.getElementById("requestModal").classList.add("show");
+  modal?.classList.add("show");
 
   const selected = templates.find(
     item => item.id === Number(templateId)
   );
 
-  if (selected) {
-    document.getElementById("project").value = selected.name;
+  const projectInput = document.getElementById("project");
+
+  if (selected && projectInput) {
+    projectInput.value = selected.name;
+  }
+
+  if (requestResult) {
+    requestResult.textContent = "";
   }
 }
 
-// إغلاق نموذج الطلب
 function closeForm() {
-  document.getElementById("requestModal").classList.remove("show");
+  modal?.classList.remove("show");
 }
 
-// إغلاق النموذج عند الضغط خارجه
-document.getElementById("requestModal").addEventListener("click", event => {
-  if (event.target.id === "requestModal") {
+window.openForm = openForm;
+window.closeForm = closeForm;
+
+window.toggleLanguage = function () {
+  alert("الترجمة الإنجليزية الكاملة سنضيفها لاحقًا.");
+};
+
+modal?.addEventListener("click", event => {
+  if (event.target === modal) {
     closeForm();
   }
 });
 
-// إرسال طلب العميل إلى واتساب
-document.getElementById("requestForm").addEventListener("submit", event => {
+// حفظ الطلب في Firebase أولًا ثم فتح واتساب
+requestForm?.addEventListener("submit", async event => {
   event.preventDefault();
 
-  const form = new FormData(event.target);
+  const submitButton = requestForm.querySelector(
+    'button[type="submit"]'
+  );
 
-  const project = form.get("project").trim();
-  const category = form.get("category");
-  const phone = form.get("phone") || "غير محدد";
-  const details = form.get("details").trim();
+  const form = new FormData(requestForm);
+
+  const project = String(form.get("project") || "").trim();
+  const category = String(form.get("category") || "").trim();
+  const phone = String(form.get("phone") || "").trim();
+  const details = String(form.get("details") || "").trim();
+
+  if (!project || !category || !details) {
+    requestResult.textContent =
+      "يرجى تعبئة اسم المشروع ونوع المشروع والتفاصيل.";
+    return;
+  }
 
   const message = `طلب تصميم موقع جديد - Velora
 
 اسم المشروع: ${project}
 نوع المشروع: ${category}
-رقم العميل: ${phone}
+رقم العميل: ${phone || "غير محدد"}
 
 تفاصيل المشروع:
 ${details}`;
 
-  // رقم واتساب Velora بصيغة دولية
-  const WHATSAPP_NUMBER = "962791734396";
-
   const whatsappURL =
-    "https://wa.me/" +
-    WHATSAPP_NUMBER +
-    "?text=" +
+    "https://wa.me/962791734396?text=" +
     encodeURIComponent(message);
 
-  window.open(whatsappURL, "_blank");
+  submitButton.disabled = true;
+  submitButton.textContent = "جارٍ حفظ الطلب...";
+  requestResult.textContent =
+    "جارٍ حفظ طلبك، يرجى الانتظار...";
+
+  try {
+    // لن نفتح واتساب إلا بعد نجاح الحفظ
+    await addDoc(collection(db, "orders"), {
+      project,
+      category,
+      phone,
+      details,
+      status: "new",
+      createdAt: serverTimestamp()
+    });
+
+    requestResult.textContent =
+      "تم حفظ الطلب بنجاح! جارٍ فتح واتساب لإكمال الإرسال.";
+
+    submitButton.textContent = "تم حفظ الطلب";
+
+    // الانتقال إلى واتساب بعد نجاح Firebase
+    window.location.href = whatsappURL;
+
+  } catch (error) {
+    console.error("Firebase save error:", error);
+
+    requestResult.textContent =
+      "تعذّر حفظ الطلب في قاعدة البيانات. لم نفتح واتساب. حاولي مرة أخرى.";
+
+    submitButton.disabled = false;
+    submitButton.textContent = "إعادة المحاولة";
+  }
 });
 
-// زر اللغة: مؤقت إلى أن نضيف الترجمة الكاملة
-function toggleLanguage() {
-  alert("الترجمة الإنجليزية الكاملة ستكون في المرحلة التالية.");
-}
-
-// تشغيل القوالب عند فتح الصفحة
 renderTemplates();

@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Velora | لوحة التحكم</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: #f7f5ef;
+      color: #20251f;
+      font-family: Arial, sans-serif;
+    }
+
+    .panel {
+      width: 100%;
+      max-width: 420px;
+      padding: 32px;
+      background: white;
+      border: 1px solid #ded8ca;
+      border-radius: 20px;
+      box-shadow: 0 18px 50px #20251f12;
+    }
+
+    .logo {
+      margin: 0 0 24px;
+      text-align: center;
+      font: bold 36px Georgia, serif;
+    }
+
+    .logo span { color: #b69a61; }
+
+    h1 { font-size: 24px; }
+
+    p {
+      color: #77756d;
+      line-height: 1.8;
+    }
+
+    label {
+      display: block;
+      margin: 16px 0 7px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #ded8ca;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 22px;
+      padding: 14px;
+      border: 0;
+      border-radius: 30px;
+      background: #20251f;
+      color: white;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    #message {
+      margin-top: 16px;
+      overflow-wrap: anywhere;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <div class="logo">Velora<span>.</span></div>
+    <h1>تسجيل دخول الإدارة</h1>
+    <p>سجّلي الدخول بحساب الإدارة للوصول إلى طلبات العملاء.</p>
+
+    <form id="loginForm">
+      <label for="email">البريد الإلكتروني</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autocomplete="username"
+        required
+      >
+
+      <label for="password">كلمة المرور</label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        required
+      >
+
+      <button id="loginButton" type="submit">تسجيل الدخول</button>
+      <div id="message" role="status" aria-live="polite"></div>
+    </form>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword
+    } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC3cGX_eZXa11EbOrHtsS7KwMi_FZYnUT4",
+      authDomain: "velora-89ee1.firebaseapp.com",
+      projectId: "velora-89ee1",
+      storageBucket: "velora-89ee1.firebasestorage.app",
+      messagingSenderId: "844313456077",
+      appId: "1:844313456077:web:2a52c2006548f5ae892884",
+      measurementId: "G-Q9CRKMTGWX"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const form = document.getElementById("loginForm");
+    const message = document.getElementById("message");
+    const button = document.getElementById("loginButton");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      button.disabled = true;
+      button.textContent = "جارٍ تسجيل الدخول...";
+      message.textContent = "";
+
+      try {
+        const credential = await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+        if (credential.user.uid !== "WTtQENLzC4fyCxZ5pu0kV5N2Iwt2") {
+          await auth.signOut();
+          throw new Error("ليس لديكِ صلاحية دخول لوحة الإدارة.");
+        }
+
+        message.textContent = "تم تسجيل الدخول بنجاح، لكن صفحة عرض الطلبات لم تُجهّز بعد.";
+      } catch (error) {
+        console.error("Admin login error:", error);
+        message.textContent =
+          error.code === "auth/invalid-credential"
+            ? "البريد الإلكتروني أو كلمة المرور غير صحيحة."
+            : error.message || "تعذّر تسجيل الدخول. حاولي مرة أخرى.";
+      } finally {
+        button.disabled = false;
+        button.textContent = "تسجيل الدخول";
+      }
+    });
+  </script>
+</body>
+</html>

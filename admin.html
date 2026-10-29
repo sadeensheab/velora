@@ -4,121 +4,419 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Velora | لوحة التحكم</title>
+  <title>Velora | لوحة الإدارة</title>
+
   <style>
+    :root {
+      --bg: #f7f5ef;
+      --dark: #20251f;
+      --gold: #b69a61;
+      --line: #ded8ca;
+      --muted: #77756d;
+      --white: #fff;
+    }
+
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-      background: #f7f5ef;
-      color: #20251f;
+      background: var(--bg);
+      color: var(--dark);
       font-family: Arial, sans-serif;
     }
 
-    .panel {
-      width: 100%;
-      max-width: 420px;
-      padding: 32px;
-      background: white;
-      border: 1px solid #ded8ca;
-      border-radius: 20px;
-      box-shadow: 0 18px 50px #20251f12;
+    button, input, select { font: inherit; }
+
+    button {
+      cursor: pointer;
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 18px;
+      background: var(--dark);
+      color: white;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: wait;
     }
 
     .logo {
-      margin: 0 0 24px;
+      font: bold 34px Georgia, serif;
+      direction: ltr;
       text-align: center;
-      font: bold 36px Georgia, serif;
     }
 
-    .logo span { color: #b69a61; }
+    .logo span { color: var(--gold); }
 
-    h1 { font-size: 24px; }
+    .login-wrap {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
 
-    p {
-      color: #77756d;
+    .login-card {
+      width: 100%;
+      max-width: 430px;
+      padding: 32px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: white;
+      box-shadow: 0 18px 50px #20251f12;
+    }
+
+    h1 { font-size: 25px; }
+
+    .muted, .subtitle {
+      color: var(--muted);
       line-height: 1.8;
     }
 
     label {
       display: block;
       margin: 16px 0 7px;
-      font-size: 14px;
       font-weight: bold;
+      font-size: 14px;
     }
 
     input {
       width: 100%;
       padding: 13px;
-      border: 1px solid #ded8ca;
+      border: 1px solid var(--line);
       border-radius: 10px;
-      font-size: 16px;
+      background: white;
     }
 
-    button {
-      width: 100%;
-      margin-top: 22px;
-      padding: 14px;
-      border: 0;
-      border-radius: 30px;
-      background: #20251f;
-      color: white;
-      font-size: 15px;
-      cursor: pointer;
-    }
+    .full { width: 100%; margin-top: 20px; }
 
-    button:disabled {
-      opacity: .6;
-      cursor: wait;
-    }
-
-    #message {
-      margin-top: 16px;
+    .message {
+      margin-top: 14px;
+      line-height: 1.7;
       overflow-wrap: anywhere;
       font-size: 14px;
     }
+
+    .error { color: #b42318; }
+    .success { color: #24733a; }
+
+    [hidden] { display: none !important; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      padding: 20px 5%;
+      background: white;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .topbar .logo {
+      font-size: 30px;
+      text-align: right;
+    }
+
+    .topbar p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .logout {
+      background: transparent;
+      color: var(--dark);
+      border: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    main.dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+    }
+
+    .heading-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .heading-row h1 { margin-bottom: 5px; }
+
+    .refresh {
+      background: white;
+      color: var(--dark);
+      border: 1px solid var(--line);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      padding: 20px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .stat strong {
+      font-size: 27px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .toolbar input, .toolbar select {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      background: white;
+    }
+
+    .toolbar input { flex: 1; }
+    .toolbar select { width: 190px; }
+
+    .orders {
+      display: grid;
+      gap: 16px;
+    }
+
+    .order {
+      padding: 22px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      min-width: 0;
+    }
+
+    .order-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #eee9df;
+      padding-bottom: 15px;
+      margin-bottom: 16px;
+    }
+
+    .order h2 {
+      font-size: 19px;
+      margin: 0 0 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .order small { color: var(--muted); }
+
+    .order-details {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .detail {
+      min-width: 0;
+      line-height: 1.8;
+      overflow-wrap: anywhere;
+    }
+
+    .detail strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .detail p { margin: 0; white-space: pre-wrap; }
+
+    .order-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid #eee9df;
+    }
+
+    .order-actions label {
+      margin: 0;
+      font-size: 13px;
+    }
+
+    .order-actions select {
+      flex: 1;
+      min-width: 150px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: white;
+    }
+
+    .delete {
+      background: #fff0ee;
+      color: #a5261b;
+    }
+
+    .empty {
+      padding: 35px 20px;
+      text-align: center;
+      color: var(--muted);
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    @media (max-width: 700px) {
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .order-details { grid-template-columns: 1fr; }
+      .toolbar { flex-direction: column; }
+      .toolbar select { width: 100%; }
+      .topbar { padding: 16px; }
+      .topbar .logo { font-size: 25px; }
+      .topbar p { max-width: 220px; }
+      main.dashboard { padding: 22px 14px 40px; }
+      .login-card { padding: 24px; }
+    }
   </style>
 </head>
+
 <body>
-  <main class="panel">
-    <div class="logo">Velora<span>.</span></div>
-    <h1>تسجيل دخول الإدارة</h1>
-    <p>سجّلي الدخول بحساب الإدارة للوصول إلى طلبات العملاء.</p>
+  <!-- شاشة تسجيل الدخول -->
+  <section id="loginScreen" class="login-wrap">
+    <div class="login-card">
+      <div class="logo">Velora<span>.</span></div>
+      <h1>تسجيل دخول الإدارة</h1>
+      <p class="subtitle">سجّلي الدخول بحساب المدير للوصول إلى طلبات العملاء.</p>
 
-    <form id="loginForm">
-      <label for="email">البريد الإلكتروني</label>
-      <input
-        id="email"
-        name="email"
-        type="email"
-        autocomplete="username"
-        required
-      >
+      <form id="loginForm">
+        <label for="email">البريد الإلكتروني</label>
+        <input
+          id="email"
+          type="email"
+          autocomplete="username"
+          required
+        >
 
-      <label for="password">كلمة المرور</label>
-      <input
-        id="password"
-        name="password"
-        type="password"
-        autocomplete="current-password"
-        required
-      >
+        <label for="password">كلمة المرور</label>
+        <input
+          id="password"
+          type="password"
+          autocomplete="current-password"
+          required
+        >
 
-      <button id="loginButton" type="submit">تسجيل الدخول</button>
-      <div id="message" role="status" aria-live="polite"></div>
-    </form>
-  </main>
+        <button id="loginButton" class="full" type="submit">
+          تسجيل الدخول
+        </button>
+        <div id="loginMessage" class="message" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- لوحة التحكم: لا تظهر إلا بعد التحقق من المدير -->
+  <section id="dashboardScreen" hidden>
+    <header class="topbar">
+      <div>
+        <div class="logo">Velora<span>.</span></div>
+        <p id="adminEmail"></p>
+      </div>
+      <button id="logoutButton" class="logout" type="button">
+        تسجيل الخروج
+      </button>
+    </header>
+
+    <main class="dashboard">
+      <div class="heading-row">
+        <div>
+          <h1>إدارة الطلبات</h1>
+          <p class="muted">تابعي طلبات تصميم المواقع من مكان واحد.</p>
+        </div>
+        <button id="refreshButton" class="refresh" type="button">
+          تحديث الطلبات ↻
+        </button>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <span>كل الطلبات</span>
+          <strong id="totalCount">0</strong>
+        </div>
+        <div class="stat">
+          <span>طلبات جديدة</span>
+          <strong id="newCount">0</strong>
+        </div>
+        <div class="stat">
+          <span>قيد التنفيذ</span>
+          <strong id="progressCount">0</strong>
+        </div>
+        <div class="stat">
+          <span>مكتملة</span>
+          <strong id="doneCount">0</strong>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input
+          id="searchOrders"
+          type="search"
+          placeholder="ابحثي باسم المشروع أو رقم التواصل..."
+          aria-label="البحث في الطلبات"
+        >
+        <select id="statusFilter" aria-label="تصفية حسب حالة الطلب">
+          <option value="all">كل الحالات</option>
+          <option value="new">جديد</option>
+          <option value="in_progress">قيد التنفيذ</option>
+          <option value="completed">مكتمل</option>
+        </select>
+      </div>
+
+      <div id="dashboardMessage" class="message" role="status" aria-live="polite"></div>
+      <div id="ordersList" class="orders"></div>
+    </main>
+  </section>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+
     import {
       getAuth,
-      signInWithEmailAndPassword
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
     } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      query,
+      orderBy,
+      updateDoc,
+      deleteDoc,
+      doc
+    } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC3cGX_eZXa11EbOrHtsS7KwMi_FZYnUT4",
@@ -130,47 +428,372 @@
       measurementId: "G-Q9CRKMTGWX"
     };
 
+    const ADMIN_UID = "WTtQENLzC4fyCxZ5pu0kV5N2Iwt2";
+
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    const form = document.getElementById("loginForm");
-    const message = document.getElementById("message");
-    const button = document.getElementById("loginButton");
+    const loginScreen = document.getElementById("loginScreen");
+    const dashboardScreen = document.getElementById("dashboardScreen");
+    const loginForm = document.getElementById("loginForm");
+    const loginButton = document.getElementById("loginButton");
+    const loginMessage = document.getElementById("loginMessage");
+    const dashboardMessage = document.getElementById("dashboardMessage");
+    const ordersList = document.getElementById("ordersList");
 
-    form.addEventListener("submit", async (event) => {
+    const statusLabels = {
+      new: "جديد",
+      in_progress: "قيد التنفيذ",
+      completed: "مكتمل"
+    };
+
+    const categoryLabels = {
+      business: "موقع أعمال",
+      store: "متجر إلكتروني",
+      portfolio: "معرض أعمال",
+      restaurant: "موقع مطعم",
+      other: "نوع آخر",
+      realestate: "عقارات",
+      clinic: "عيادات",
+      fashion: "متاجر"
+    };
+
+    let allOrders = [];
+    let loadingOrders = false;
+
+    function setMessage(element, text, type = "") {
+      element.textContent = text;
+      element.className = "message" + (type ? " " + type : "");
+    }
+
+    function formatDate(value) {
+      if (!value || typeof value.toDate !== "function") {
+        return "غير متوفر";
+      }
+
+      return value.toDate().toLocaleString("ar-JO", {
+        dateStyle: "medium",
+        timeStyle: "short"
+      });
+    }
+
+    function showLogin() {
+      dashboardScreen.hidden = true;
+      loginScreen.hidden = false;
+    }
+
+    function showDashboard(user) {
+      loginScreen.hidden = true;
+      dashboardScreen.hidden = false;
+      document.getElementById("adminEmail").textContent = user.email || "";
+    }
+
+    loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      button.disabled = true;
-      button.textContent = "جارٍ تسجيل الدخول...";
-      message.textContent = "";
+      loginButton.disabled = true;
+      loginButton.textContent = "جارٍ تسجيل الدخول...";
+      setMessage(loginMessage, "");
 
       try {
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value;
+
         const credential = await signInWithEmailAndPassword(
           auth,
           email,
           password
         );
 
-        if (credential.user.uid !== "WTtQENLzC4fyCxZ5pu0kV5N2Iwt2") {
-          await auth.signOut();
-          throw new Error("ليس لديكِ صلاحية دخول لوحة الإدارة.");
+        if (credential.user.uid !== ADMIN_UID) {
+          await signOut(auth);
+          setMessage(loginMessage, "هذا الحساب ليس مخوّلًا لإدارة الطلبات.", "error");
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+
+        let message = "تعذّر تسجيل الدخول. تحققي من البيانات وحاولي مرة أخرى.";
+
+        if (
+          error.code === "auth/invalid-credential" ||
+          error.code === "auth/wrong-password" ||
+          error.code === "auth/user-not-found"
+        ) {
+          message = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+        } else if (error.code === "auth/too-many-requests") {
+          message = "محاولات كثيرة. انتظري قليلًا ثم حاولي مرة أخرى.";
+        } else if (error.code === "auth/network-request-failed") {
+          message = "تحققي من اتصال الإنترنت وحاولي مرة أخرى.";
         }
 
-        message.textContent = "تم تسجيل الدخول بنجاح، لكن صفحة عرض الطلبات لم تُجهّز بعد.";
-      } catch (error) {
-        console.error("Admin login error:", error);
-        message.textContent =
-          error.code === "auth/invalid-credential"
-            ? "البريد الإلكتروني أو كلمة المرور غير صحيحة."
-            : error.message || "تعذّر تسجيل الدخول. حاولي مرة أخرى.";
+        setMessage(loginMessage, message, "error");
       } finally {
-        button.disabled = false;
-        button.textContent = "تسجيل الدخول";
+        loginButton.disabled = false;
+        loginButton.textContent = "تسجيل الدخول";
       }
     });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        showLogin();
+        return;
+      }
+
+      if (user.uid !== ADMIN_UID) {
+        await signOut(auth);
+        showLogin();
+        setMessage(loginMessage, "هذا الحساب ليس مخوّلًا لإدارة الطلبات.", "error");
+        return;
+      }
+
+      showDashboard(user);
+      await loadOrders();
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        allOrders = [];
+        ordersList.replaceChildren();
+        setMessage(loginMessage, "تم تسجيل الخروج.", "success");
+      } catch (error) {
+        console.error(error);
+        setMessage(dashboardMessage, "تعذّر تسجيل الخروج. حاولي مرة أخرى.", "error");
+      }
+    });
+
+    document.getElementById("refreshButton").addEventListener("click", loadOrders);
+    document.getElementById("searchOrders").addEventListener("input", renderOrders);
+    document.getElementById("statusFilter").addEventListener("change", renderOrders);
+
+    async function loadOrders() {
+      if (loadingOrders) return;
+
+      const user = auth.currentUser;
+
+      if (!user || user.uid !== ADMIN_UID) {
+        setMessage(dashboardMessage, "سجّلي الدخول بحساب المدير أولًا.", "error");
+        return;
+      }
+
+      loadingOrders = true;
+      document.getElementById("refreshButton").disabled = true;
+      setMessage(dashboardMessage, "جارٍ تحميل الطلبات...");
+
+      try {
+        const ordersQuery = query(
+          collection(db, "orders"),
+          orderBy("createdAt", "desc")
+        );
+
+        const snapshot = await getDocs(ordersQuery);
+
+        allOrders = snapshot.docs.map((item) => ({
+          id: item.id,
+          ...item.data()
+        }));
+
+        updateStats();
+        renderOrders();
+
+        setMessage(
+          dashboardMessage,
+          allOrders.length
+            ? `تم تحميل ${allOrders.length} طلب بنجاح.`
+            : "ما في طلبات محفوظة حاليًا.",
+          "success"
+        );
+      } catch (error) {
+        console.error("Load orders error:", error);
+
+        if (error.code === "permission-denied") {
+          setMessage(
+            dashboardMessage,
+            "ما عندك صلاحية لقراءة الطلبات. تأكدي من نشر قواعد Firestore ومن استخدام حساب المدير الصحيح.",
+            "error"
+          );
+        } else {
+          setMessage(
+            dashboardMessage,
+            "تعذّر تحميل الطلبات. تحققي من اتصال الإنترنت وإعدادات Firebase.",
+            "error"
+          );
+        }
+      } finally {
+        loadingOrders = false;
+        document.getElementById("refreshButton").disabled = false;
+      }
+    }
+
+    function updateStats() {
+      document.getElementById("totalCount").textContent = allOrders.length;
+      document.getElementById("newCount").textContent =
+        allOrders.filter(item => (item.status || "new") === "new").length;
+      document.getElementById("progressCount").textContent =
+        allOrders.filter(item => item.status === "in_progress").length;
+      document.getElementById("doneCount").textContent =
+        allOrders.filter(item => item.status === "completed").length;
+    }
+
+    function createDetail(label, value) {
+      const wrapper = document.createElement("div");
+      wrapper.className = "detail";
+
+      const title = document.createElement("strong");
+      title.textContent = label;
+
+      const content = document.createElement("p");
+      content.textContent = value || "غير محدد";
+
+      wrapper.append(title, content);
+      return wrapper;
+    }
+
+    function renderOrders() {
+      const search = document.getElementById("searchOrders")
+        .value.trim().toLowerCase();
+
+      const statusFilter = document.getElementById("statusFilter").value;
+
+      const filtered = allOrders.filter((item) => {
+        const status = item.status || "new";
+
+        const matchesStatus =
+          statusFilter === "all" || status === statusFilter;
+
+        const searchableText = [
+          item.project,
+          item.phone,
+          item.details,
+          categoryLabels[item.category] || item.category
+        ].join(" ").toLowerCase();
+
+        return matchesStatus && searchableText.includes(search);
+      });
+
+      ordersList.replaceChildren();
+
+      if (!filtered.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = allOrders.length
+          ? "ما لقينا طلبات مطابقة للبحث."
+          : "لسه ما في طلبات لعرضها.";
+        ordersList.appendChild(empty);
+        return;
+      }
+
+      filtered.forEach((item) => {
+        const card = document.createElement("article");
+        card.className = "order";
+
+        const header = document.createElement("div");
+        header.className = "order-head";
+
+        const titleBlock = document.createElement("div");
+        const title = document.createElement("h2");
+        title.textContent = item.project || "طلب بدون اسم";
+
+        const date = document.createElement("small");
+        date.textContent = "تاريخ الطلب: " + formatDate(item.createdAt);
+
+        titleBlock.append(title, date);
+
+        const statusText = document.createElement("small");
+        statusText.textContent = "الحالة: " + (statusLabels[item.status || "new"] || "جديد");
+
+        header.append(titleBlock, statusText);
+
+        const details = document.createElement("div");
+        details.className = "order-details";
+        details.append(
+          createDetail("نوع الموقع", categoryLabels[item.category] || item.category),
+          createDetail("رقم التواصل", item.phone),
+          createDetail("تفاصيل المشروع", item.details),
+          createDetail("رقم الطلب", item.id)
+        );
+
+        const actions = document.createElement("div");
+        actions.className = "order-actions";
+
+        const statusLabel = document.createElement("label");
+        statusLabel.textContent = "تغيير الحالة:";
+
+        const select = document.createElement("select");
+        select.setAttribute("aria-label", "تغيير حالة الطلب");
+
+        Object.entries(statusLabels).forEach(([value, label]) => {
+          const option = document.createElement("option");
+          option.value = value;
+          option.textContent = label;
+          select.appendChild(option);
+        });
+
+        select.value = statusLabels[item.status] ? item.status : "new";
+
+        select.addEventListener("change", async () => {
+          const newStatus = select.value;
+          select.disabled = true;
+
+          try {
+            await updateDoc(doc(db, "orders", item.id), {
+              status: newStatus
+            });
+
+            item.status = newStatus;
+            updateStats();
+            renderOrders();
+            setMessage(dashboardMessage, "تم تحديث حالة الطلب.", "success");
+          } catch (error) {
+            console.error("Update order error:", error);
+            select.disabled = false;
+            select.value = item.status || "new";
+            setMessage(
+              dashboardMessage,
+              "تعذّر تحديث الحالة. تحققي من صلاحيات Firestore.",
+              "error"
+            );
+          }
+        });
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "delete";
+        deleteButton.textContent = "حذف الطلب";
+
+        deleteButton.addEventListener("click", async () => {
+          const confirmed = window.confirm(
+            `هل أنتِ متأكدة من حذف طلب "${item.project || "بدون اسم"}"؟ لا يمكن التراجع عن الحذف.`
+          );
+
+          if (!confirmed) return;
+
+          deleteButton.disabled = true;
+
+          try {
+            await deleteDoc(doc(db, "orders", item.id));
+
+            allOrders = allOrders.filter(order => order.id !== item.id);
+            updateStats();
+            renderOrders();
+            setMessage(dashboardMessage, "تم حذف الطلب.", "success");
+          } catch (error) {
+            console.error("Delete order error:", error);
+            deleteButton.disabled = false;
+            setMessage(
+              dashboardMessage,
+              "تعذّر حذف الطلب. تحققي من صلاحيات Firestore.",
+              "error"
+            );
+          }
+        });
+
+        actions.append(statusLabel, select, deleteButton);
+        card.append(header, details, actions);
+        ordersList.appendChild(card);
+      });
+    }
   </script>
 </body>
 </html>

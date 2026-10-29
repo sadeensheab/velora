@@ -1,6 +1,5 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
-
 import {
   getFirestore,
   collection,
@@ -8,7 +7,6 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
-// إعدادات Firebase الخاصة بمشروع Velora
 const firebaseConfig = {
   apiKey: "AIzaSyC3cGX_eZXa11EbOrHtsS7KwMi_FZYnUT4",
   authDomain: "velora-89ee1.firebaseapp.com",
@@ -22,74 +20,276 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// القوالب
+let language = "ar";
+let currentCategory = "all";
+
 const templates = [
   {
-    id: 1,
-    category: "restaurant",
-    type: "مطاعم",
-    name: "مطعم لونا",
+    id: 1, category: "restaurant",
+    type: { ar: "مطاعم", en: "Restaurants" },
+    name: { ar: "مطعم لونا", en: "Luna Restaurant" },
     title: "Taste The Difference",
-    description: "قالب أنيق للمطاعم والمقاهي وقوائم الطعام.",
+    description: {
+      ar: "قالب أنيق للمطاعم والمقاهي وقوائم الطعام.",
+      en: "An elegant template for restaurants, cafes, and menus."
+    },
     image: "photo-1414235077428-338989a2e8c0"
   },
   {
-    id: 2,
-    category: "realestate",
-    type: "عقارات",
-    name: "فيستا للعقارات",
+    id: 2, category: "realestate",
+    type: { ar: "عقارات", en: "Real Estate" },
+    name: { ar: "فيستا للعقارات", en: "Vista Real Estate" },
     title: "Modern Living Spaces",
-    description: "اعرضي العقارات والصور بطريقة فاخرة.",
+    description: {
+      ar: "اعرضي العقارات والصور بطريقة فاخرة.",
+      en: "Showcase properties and photos in a luxurious style."
+    },
     image: "photo-1600210492486-724fe5c67fb0"
   },
   {
-    id: 3,
-    category: "clinic",
-    type: "عيادات",
-    name: "عيادة نورا",
+    id: 3, category: "clinic",
+    type: { ar: "عيادات", en: "Clinics" },
+    name: { ar: "عيادة نورا", en: "Nora Clinic" },
     title: "Your Health, Our Priority",
-    description: "قالب للخدمات الطبية والتخصصات.",
+    description: {
+      ar: "قالب للخدمات الطبية والتخصصات.",
+      en: "A template for medical services and specialties."
+    },
     image: "photo-1629909613654-28e377c37b09"
   },
   {
-    id: 4,
-    category: "fashion",
-    type: "متاجر",
-    name: "دار أورا",
+    id: 4, category: "fashion",
+    type: { ar: "متاجر", en: "Fashion" },
+    name: { ar: "دار أورا", en: "Aura Boutique" },
     title: "Wear Your Story",
-    description: "تصميم أنيق لمتاجر الأزياء والعلامات التجارية.",
+    description: {
+      ar: "تصميم أنيق لمتاجر الأزياء والعلامات التجارية.",
+      en: "An elegant design for fashion stores and brands."
+    },
     image: "photo-1483985988355-763728e1935b"
   },
   {
-    id: 5,
-    category: "business",
-    type: "شركات",
-    name: "أطلس للأعمال",
+    id: 5, category: "business",
+    type: { ar: "شركات", en: "Business" },
+    name: { ar: "أطلس للأعمال", en: "Atlas Business" },
     title: "Ideas Into Impact",
-    description: "اعرضي خدمات شركتك وأعمالك.",
+    description: {
+      ar: "اعرضي خدمات شركتك وأعمالك.",
+      en: "Showcase your company's services and work."
+    },
     image: "photo-1486406146926-c627a92ad1ab"
   },
   {
-    id: 6,
-    category: "business",
-    type: "شركات",
-    name: "ستوديو الإبداع",
+    id: 6, category: "business",
+    type: { ar: "شركات", en: "Business" },
+    name: { ar: "ستوديو الإبداع", en: "Creative Studio" },
     title: "Made With Intention",
-    description: "قالب احترافي للمشاريع الإبداعية.",
+    description: {
+      ar: "قالب احترافي للمشاريع الإبداعية.",
+      en: "A professional template for creative projects."
+    },
     image: "photo-1497366754035-f200968a6e72"
   }
 ];
 
-const grid = document.getElementById("templateGrid");
-const searchInput = document.getElementById("searchInput");
-const count = document.getElementById("templateCount");
-const modal = document.getElementById("requestModal");
-const requestForm = document.getElementById("requestForm");
-const requestResult = document.getElementById("requestResult");
+const $ = (selector) => document.querySelector(selector);
+const grid = $("#templateGrid");
+const searchInput = $("#searchInput");
+const count = $("#templateCount");
+const modal = $("#requestModal");
+const requestForm = $("#requestForm");
+const requestResult = $("#requestResult");
 
-let currentCategory = "all";
+const text = {
+  ar: {
+    nav: ["الرئيسية", "القوالب", "تواصل معنا"],
+    eyebrow: "أفكارك تستحق موقعًا مميزًا",
+    heroTitle: 'حوّلي فكرتك إلى <span>موقع إلكتروني رائع</span>',
+    heroDesc: "اختاري التصميم الذي يناسبك، وأرسلي طلبك بسهولة. نحن هنا لمساعدتك في تحويل فكرتك إلى واقع.",
+    explore: "اكتشفي القوالب",
+    order: "اطلبي تصميمك",
+    benefits: ["✦ تصاميم عصرية", "✦ سهولة تقديم الطلب", "✦ تواصل مباشر"],
+    gallery: "معرض التصاميم",
+    choose: "اختاري قالبك المفضل",
+    galleryDesc: "تصفحي التصاميم واختاري ما يناسب مشروعك.",
+    search: "ابحثي عن قالب...",
+    all: "الكل",
+    categories: ["مطاعم", "عقارات", "عيادات", "متاجر", "شركات"],
+    noResults: "ما لقينا قوالب مطابقة لبحثك.",
+    requestTemplate: "اطلبي هذا القالب ↗",
+    howEyebrow: "خطوات بسيطة",
+    howTitle: "كيف تطلبي موقعك؟",
+    steps: [
+      ["اختاري قالبك", "تصفحي القوالب واختاري التصميم الأقرب لفكرتك."],
+      ["أرسلي التفاصيل", "عبّي نموذج الطلب بمعلومات مشروعك."],
+      ["احفظي طلبك", "سيحاول الموقع حفظ تفاصيل الطلب في قاعدة البيانات."],
+      ["تواصلي معنا", "بعد نجاح الحفظ، يمكنك متابعة الطلب عبر واتساب."]
+    ],
+    contactEyebrow: "لديك فكرة مختلفة؟",
+    contactTitle: "خلينا نبني موقعك الخاص",
+    contactDesc: "احكي لنا عن مشروعك، وابدئي طلب تصميمك.",
+    orderNow: "اطلبي تصميمك الآن ↗",
+    rights: "© 2026 Velora. جميع الحقوق محفوظة.",
+    modalTitle: "خلينا نصمم موقعك",
+    modalDesc: "عبّي معلومات مشروعك حتى نجهز طلبك.",
+    project: "اسم المشروع",
+    projectPlaceholder: "مثال: متجري الإلكتروني",
+    category: "نوع المشروع",
+    chooseCategory: "اختاري نوع الموقع",
+    options: ["موقع أعمال", "متجر إلكتروني", "معرض أعمال", "موقع مطعم", "نوع آخر"],
+    phone: "رقم واتساب (اختياري)",
+    details: "احكي لنا عن فكرتك",
+    detailsPlaceholder: "شو حابة يكون موجود بموقعك؟",
+    submit: "تجهيز طلب الموقع",
+    required: "يرجى تعبئة اسم المشروع ونوع المشروع والتفاصيل.",
+    saving: "جارٍ حفظ الطلب...",
+    wait: "جارٍ حفظ طلبك، يرجى الانتظار...",
+    saved: "تم حفظ الطلب بنجاح! جارٍ فتح واتساب لإكمال الإرسال.",
+    failed: "تعذّر حفظ الطلب في قاعدة البيانات. لم نفتح واتساب. حاولي مرة أخرى.",
+    retry: "إعادة المحاولة",
+    savedButton: "تم حفظ الطلب",
+    count: (n) => `${n} قوالب`
+  },
+  en: {
+    nav: ["Home", "Templates", "Contact Us"],
+    eyebrow: "Your ideas deserve a remarkable website",
+    heroTitle: 'Turn your idea into a <span>beautiful website</span>',
+    heroDesc: "Choose a design that suits you and submit your request with ease. We're here to bring your idea to life.",
+    explore: "Explore Templates",
+    order: "Order Your Design",
+    benefits: ["✦ Modern Designs", "✦ Easy Ordering", "✦ Direct Communication"],
+    gallery: "DESIGN GALLERY",
+    choose: "Choose Your Favorite Template",
+    galleryDesc: "Browse the designs and find the right fit for your project.",
+    search: "Search templates...",
+    all: "All",
+    categories: ["Restaurants", "Real Estate", "Clinics", "Stores", "Business"],
+    noResults: "No templates match your search.",
+    requestTemplate: "Request This Template ↗",
+    howEyebrow: "Simple Steps",
+    howTitle: "How to Get Your Website",
+    steps: [
+      ["Choose a Template", "Browse the templates and choose the design that fits your idea."],
+      ["Share Your Details", "Fill out the request form with your project information."],
+      ["Save Your Request", "The website will save your request details to the database."],
+      ["Contact Us", "Once saved successfully, you can continue via WhatsApp."]
+    ],
+    contactEyebrow: "Have a Different Idea?",
+    contactTitle: "Let's Build Your Website",
+    contactDesc: "Tell us about your project and start your design request.",
+    orderNow: "Order Your Design Now ↗",
+    rights: "© 2026 Velora. All rights reserved.",
+    modalTitle: "Let's Design Your Website",
+    modalDesc: "Fill in your project details to prepare your request.",
+    project: "Project Name",
+    projectPlaceholder: "Example: My Online Store",
+    category: "Project Type",
+    chooseCategory: "Choose a website type",
+    options: ["Business Website", "Online Store", "Portfolio", "Restaurant Website", "Other"],
+    phone: "WhatsApp Number (Optional)",
+    details: "Tell Us About Your Idea",
+    detailsPlaceholder: "What would you like to include on your website?",
+    submit: "Prepare Request",
+    required: "Please enter the project name, type, and details.",
+    saving: "Saving your request...",
+    wait: "Saving your request, please wait...",
+    saved: "Request saved successfully! Opening WhatsApp to continue.",
+    failed: "Could not save your request. WhatsApp was not opened. Please try again.",
+    retry: "Try Again",
+    savedButton: "Request Saved",
+    count: (n) => `${n} templates`
+  }
+};
 
-// عرض القوالب
+function setText(selector, value, html = false) {
+  const element = $(selector);
+  if (element) {
+    if (html) element.innerHTML = value;
+    else element.textContent = value;
+  }
+}
+
+function applyLanguage() {
+  const t = text[language];
+  document.documentElement.lang = language;
+  document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
+
+  setText(".nav-actions button", language === "ar" ? "English" : "العربية");
+  document.querySelectorAll("nav a").forEach((el, i) => {
+    el.textContent = t.nav[i];
+  });
+
+  setText(".hero-content .eyebrow", t.eyebrow);
+  setText(".hero-content h1", t.heroTitle, true);
+  setText(".hero-content > p:not(.eyebrow)", t.heroDesc);
+  setText(".hero-buttons a", t.explore);
+  setText(".hero-buttons button", t.order);
+  document.querySelectorAll(".benefits span").forEach((el, i) => el.textContent = t.benefits[i]);
+
+  setText(".section-heading .eyebrow", t.gallery);
+  setText(".section-heading h2", t.choose);
+  setText(".section-heading > div > p:last-child", t.galleryDesc);
+  if (searchInput) {
+    searchInput.placeholder = t.search;
+    searchInput.setAttribute("aria-label", t.search);
+  }
+
+  const filterButtons = document.querySelectorAll(".filter");
+  const filterLabels = [t.all, ...t.categories];
+  filterButtons.forEach((el, i) => {
+    if (filterLabels[i]) el.textContent = filterLabels[i];
+  });
+
+  setText(".how-section .eyebrow", t.howEyebrow);
+  setText(".how-section h2", t.howTitle);
+  document.querySelectorAll(".steps article").forEach((el, i) => {
+    el.querySelector("h3").textContent = t.steps[i][0];
+    el.querySelector("p").textContent = t.steps[i][1];
+  });
+
+  setText(".contact .eyebrow", t.contactEyebrow);
+  setText(".contact h2", t.contactTitle);
+  setText(".contact div > p:last-child", t.contactDesc);
+  setText(".contact button", t.orderNow);
+  setText("footer p", t.rights);
+
+  setText("#requestTitle", t.modalTitle);
+  setText(".modal-box > p", t.modalDesc);
+
+  const labels = document.querySelectorAll("#requestForm label");
+  [t.project, t.category, t.phone, t.details].forEach((value, i) => {
+    if (labels[i]) labels[i].textContent = value;
+  });
+
+  const projectInput = $("#project");
+  const categorySelect = $("#category");
+  const phoneInput = $("#phone");
+  const detailsInput = $("#details");
+
+  if (projectInput) projectInput.placeholder = t.projectPlaceholder;
+  if (phoneInput) phoneInput.placeholder = "962...";
+  if (detailsInput) detailsInput.placeholder = t.detailsPlaceholder;
+
+  if (categorySelect) {
+    categorySelect.options[0].textContent = t.chooseCategory;
+    t.options.forEach((value, i) => {
+      if (categorySelect.options[i + 1]) {
+        categorySelect.options[i + 1].textContent = value;
+      }
+    });
+  }
+
+  const submit = requestForm?.querySelector('button[type="submit"]');
+  if (submit && !submit.disabled) submit.textContent = t.submit;
+
+  renderTemplates();
+}
+
+window.toggleLanguage = function () {
+  language = language === "ar" ? "en" : "ar";
+  applyLanguage();
+};
+
 function renderTemplates() {
   if (!grid || !searchInput || !count) return;
 
@@ -97,46 +297,38 @@ function renderTemplates() {
 
   const filtered = templates.filter(item => {
     const categoryMatch =
-      currentCategory === "all" ||
-      item.category === currentCategory;
+      currentCategory === "all" || item.category === currentCategory;
 
-    const searchText =
-      `${item.name} ${item.title} ${item.type} ${item.description}`
-        .toLowerCase();
+    const searchText = [
+      item.name[language], item.title,
+      item.type[language], item.description[language]
+    ].join(" ").toLowerCase();
 
     return categoryMatch && searchText.includes(query);
   });
 
-  count.textContent = `${filtered.length} قوالب`;
+  count.textContent = text[language].count(filtered.length);
 
   if (filtered.length === 0) {
-    grid.innerHTML = "<p>ما لقينا قوالب مطابقة لبحثك.</p>";
+    grid.innerHTML = `<p>${text[language].noResults}</p>`;
     return;
   }
 
   grid.innerHTML = filtered.map(item => `
     <article class="template-card">
-      <div class="card-image"
-        style="background-image:
+      <div class="card-image" style="background-image:
         linear-gradient(0deg,#17191499,transparent),
         url('https://images.unsplash.com/${item.image}?auto=format&fit=crop&w=900&q=80')">
-
-        <span class="card-number">
-          VELORA / ${String(item.id).padStart(2, "0")}
-        </span>
-
+        <span class="card-number">VELORA / ${String(item.id).padStart(2, "0")}</span>
         <h3>${item.title}</h3>
       </div>
-
       <div class="card-body">
-        <span class="card-category">${item.type}</span>
-        <h4>${item.name}</h4>
-        <p>${item.description}</p>
-
+        <span class="card-category">${item.type[language]}</span>
+        <h4>${item.name[language]}</h4>
+        <p>${item.description[language]}</p>
         <div class="card-actions">
-          <button type="button" class="btn btn-dark"
-            data-template-id="${item.id}">
-            اطلبي هذا القالب ↗
+          <button type="button" class="btn btn-dark" data-template-id="${item.id}">
+            ${text[language].requestTemplate}
           </button>
         </div>
       </div>
@@ -144,18 +336,13 @@ function renderTemplates() {
   `).join("");
 
   grid.querySelectorAll("[data-template-id]").forEach(button => {
-    button.addEventListener("click", () => {
-      openForm(button.dataset.templateId);
-    });
+    button.addEventListener("click", () => openForm(button.dataset.templateId));
   });
 }
 
-// تصنيفات القوالب
 document.querySelectorAll(".filter").forEach(button => {
   button.addEventListener("click", () => {
-    document.querySelector(".filter.active")
-      ?.classList.remove("active");
-
+    $(".filter.active")?.classList.remove("active");
     button.classList.add("active");
     currentCategory = button.dataset.category;
     renderTemplates();
@@ -164,23 +351,17 @@ document.querySelectorAll(".filter").forEach(button => {
 
 searchInput?.addEventListener("input", renderTemplates);
 
-// فتح نموذج الطلب
 function openForm(templateId = "") {
   modal?.classList.add("show");
 
-  const selected = templates.find(
-    item => item.id === Number(templateId)
-  );
-
-  const projectInput = document.getElementById("project");
+  const selected = templates.find(item => item.id === Number(templateId));
+  const projectInput = $("#project");
 
   if (selected && projectInput) {
-    projectInput.value = selected.name;
+    projectInput.value = selected.name[language];
   }
 
-  if (requestResult) {
-    requestResult.textContent = "";
-  }
+  if (requestResult) requestResult.textContent = "";
 }
 
 function closeForm() {
@@ -190,57 +371,63 @@ function closeForm() {
 window.openForm = openForm;
 window.closeForm = closeForm;
 
-window.toggleLanguage = function () {
-  alert("الترجمة الإنجليزية الكاملة سنضيفها لاحقًا.");
-};
-
 modal?.addEventListener("click", event => {
-  if (event.target === modal) {
-    closeForm();
-  }
+  if (event.target === modal) closeForm();
 });
 
-// حفظ الطلب في Firebase أولًا ثم فتح واتساب
 requestForm?.addEventListener("submit", async event => {
   event.preventDefault();
 
-  const submitButton = requestForm.querySelector(
-    'button[type="submit"]'
-  );
-
+  const submitButton = requestForm.querySelector('button[type="submit"]');
   const form = new FormData(requestForm);
 
   const project = String(form.get("project") || "").trim();
   const category = String(form.get("category") || "").trim();
   const phone = String(form.get("phone") || "").trim();
   const details = String(form.get("details") || "").trim();
+  const t = text[language];
 
   if (!project || !category || !details) {
-    requestResult.textContent =
-      "يرجى تعبئة اسم المشروع ونوع المشروع والتفاصيل.";
+    requestResult.textContent = t.required;
     return;
   }
 
-  const message = `طلب تصميم موقع جديد - Velora
+  const categoryLabels = {
+    business: { ar: "موقع أعمال", en: "Business Website" },
+    store: { ar: "متجر إلكتروني", en: "Online Store" },
+    portfolio: { ar: "معرض أعمال", en: "Portfolio" },
+    restaurant: { ar: "موقع مطعم", en: "Restaurant Website" },
+    other: { ar: "نوع آخر", en: "Other" }
+  };
+
+  const categoryName = categoryLabels[category]?.[language] || category;
+
+  const message = language === "ar"
+    ? `طلب تصميم موقع جديد - Velora
 
 اسم المشروع: ${project}
-نوع المشروع: ${category}
+نوع المشروع: ${categoryName}
 رقم العميل: ${phone || "غير محدد"}
 
 تفاصيل المشروع:
+${details}`
+    : `New Website Design Request - Velora
+
+Project Name: ${project}
+Project Type: ${categoryName}
+Customer Phone: ${phone || "Not provided"}
+
+Project Details:
 ${details}`;
 
   const whatsappURL =
-    "https://wa.me/962791734396?text=" +
-    encodeURIComponent(message);
+    "https://wa.me/962791734396?text=" + encodeURIComponent(message);
 
   submitButton.disabled = true;
-  submitButton.textContent = "جارٍ حفظ الطلب...";
-  requestResult.textContent =
-    "جارٍ حفظ طلبك، يرجى الانتظار...";
+  submitButton.textContent = t.saving;
+  requestResult.textContent = t.wait;
 
   try {
-    // لن نفتح واتساب إلا بعد نجاح الحفظ
     await addDoc(collection(db, "orders"), {
       project,
       category,
@@ -250,23 +437,15 @@ ${details}`;
       createdAt: serverTimestamp()
     });
 
-    requestResult.textContent =
-      "تم حفظ الطلب بنجاح! جارٍ فتح واتساب لإكمال الإرسال.";
-
-    submitButton.textContent = "تم حفظ الطلب";
-
-    // الانتقال إلى واتساب بعد نجاح Firebase
+    requestResult.textContent = t.saved;
+    submitButton.textContent = t.savedButton;
     window.location.href = whatsappURL;
-
   } catch (error) {
     console.error("Firebase save error:", error);
-
-    requestResult.textContent =
-      "تعذّر حفظ الطلب في قاعدة البيانات. لم نفتح واتساب. حاولي مرة أخرى.";
-
+    requestResult.textContent = t.failed;
     submitButton.disabled = false;
-    submitButton.textContent = "إعادة المحاولة";
+    submitButton.textContent = t.retry;
   }
 });
 
-renderTemplates();
+applyLanguage();

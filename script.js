@@ -1,3 +1,4 @@
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
 import {
   getFirestore,
@@ -145,6 +146,8 @@ const text = {
     wait: "جارٍ حفظ طلبك، يرجى الانتظار...",
     saved: "تم حفظ الطلب بنجاح! جارٍ فتح واتساب لإكمال الإرسال.",
     failed: "تعذّر حفظ الطلب في قاعدة البيانات. لم نفتح واتساب. حاولي مرة أخرى.",
+    rateLimit: "تم إرسال طلب قبل قليل. يرجى الانتظار 60 ثانية قبل إرسال طلب جديد من هذا المتصفح.",
+    invalidLength: "تأكدي من طول البيانات: اسم المشروع حتى 120 حرفًا، رقم الهاتف حتى 40 حرفًا، والتفاصيل حتى 2000 حرف.",
     retry: "إعادة المحاولة",
     savedButton: "تم حفظ الطلب",
     count: (n) => `${n} قوالب`
@@ -194,6 +197,8 @@ const text = {
     wait: "Saving your request, please wait...",
     saved: "Request saved successfully! Opening WhatsApp to continue.",
     failed: "Could not save your request. WhatsApp was not opened. Please try again.",
+    rateLimit: "A request was sent recently. Please wait 60 seconds before sending another request from this browser.",
+    invalidLength: "Please check the field lengths: project name up to 120 characters, phone up to 40, and details up to 2000.",
     retry: "Try Again",
     savedButton: "Request Saved",
     count: (n) => `${n} templates`
@@ -214,6 +219,7 @@ function applyLanguage() {
   document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
 
   setText(".nav-actions button", language === "ar" ? "English" : "العربية");
+
   document.querySelectorAll("nav a").forEach((el, i) => {
     el.textContent = t.nav[i];
   });
@@ -223,7 +229,10 @@ function applyLanguage() {
   setText(".hero-content > p:not(.eyebrow)", t.heroDesc);
   setText(".hero-buttons a", t.explore);
   setText(".hero-buttons button", t.order);
-  document.querySelectorAll(".benefits span").forEach((el, i) => el.textContent = t.benefits[i]);
+
+  document.querySelectorAll(".benefits span").forEach((el, i) => {
+    el.textContent = t.benefits[i];
+  });
 
   setText(".section-heading .eyebrow", t.gallery);
   setText(".section-heading h2", t.choose);
@@ -258,7 +267,7 @@ function applyLanguage() {
   setText("#requestTitle", t.modalTitle);
   setText(".modal-box > p", t.modalDesc);
 
-  // اختيار تسميات الحقول الظاهرة بالاعتماد على for حتى لا تتأثر بخانة مكافحة الروبوتات المخفية
+  // اختيار تسميات الحقول الظاهرة حتى لا تتأثر بخانة مكافحة الروبوتات المخفية
   const labels = [
     $("#requestForm label[for='project']"),
     $("#requestForm label[for='category']"),
@@ -281,6 +290,7 @@ function applyLanguage() {
 
   if (categorySelect) {
     categorySelect.options[0].textContent = t.chooseCategory;
+
     t.options.forEach((value, i) => {
       if (categorySelect.options[i + 1]) {
         categorySelect.options[i + 1].textContent = value;
@@ -414,6 +424,38 @@ requestForm?.addEventListener("submit", async event => {
     return;
   }
 
+  // مطابقة حدود البيانات مع قواعد Firestore
+  const allowedCategories = ["business", "store", "portfolio", "restaurant", "other"];
+
+  if (
+    project.length > 120 ||
+    phone.length > 40 ||
+    details.length > 2000 ||
+    !allowedCategories.includes(category)
+  ) {
+    requestResult.textContent = t.invalidLength;
+    return;
+  }
+
+  // حد بسيط: انتظار 60 ثانية بين الطلبات الناجحة من نفس المتصفح
+  const cooldownKey = "velora_last_successful_order";
+  const cooldownMs = 60 * 1000;
+  let lastOrderTime = 0;
+
+  try {
+    lastOrderTime = Number(localStorage.getItem(cooldownKey) || 0);
+  } catch (error) {
+    console.warn("Could not read local cooldown:", error);
+  }
+
+  const remainingMs = cooldownMs - (Date.now() - lastOrderTime);
+
+  if (lastOrderTime > 0 && remainingMs > 0) {
+    const remainingSeconds = Math.ceil(remainingMs / 1000);
+    requestResult.textContent = `${t.rateLimit} (${remainingSeconds}s)`;
+    return;
+  }
+
   const categoryLabels = {
     business: { ar: "موقع أعمال", en: "Business Website" },
     store: { ar: "متجر إلكتروني", en: "Online Store" },
@@ -458,6 +500,13 @@ ${details}`;
       status: "new",
       createdAt: serverTimestamp()
     });
+
+    // تسجيل وقت نجاح الطلب حتى نمنع الإرسال المتكرر السريع من نفس المتصفح
+    try {
+      localStorage.setItem(cooldownKey, String(Date.now()));
+    } catch (error) {
+      console.warn("Could not save local cooldown:", error);
+    }
 
     requestResult.textContent = t.saved;
     submitButton.textContent = t.savedButton;

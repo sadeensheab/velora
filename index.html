@@ -13,17 +13,13 @@
   <header>
     <div class="navbar">
       <a href="#home" class="logo">Velora<span>.</span></a>
-
       <nav>
         <a href="#home">الرئيسية</a>
         <a href="#templates">القوالب</a>
         <a href="#contact">تواصل معنا</a>
       </nav>
-
       <div class="nav-actions">
-        <button class="btn btn-outline" type="button" onclick="toggleLanguage()">
-          English
-        </button>
+        <button class="btn btn-outline" type="button" onclick="toggleLanguage()">English</button>
       </div>
     </div>
   </header>
@@ -32,24 +28,12 @@
     <section class="hero" id="home">
       <div class="hero-content">
         <p class="eyebrow">أفكارك تستحق موقعًا مميزًا</p>
-
-        <h1>
-          حوّلي فكرتك إلى
-          <span>موقع إلكتروني رائع</span>
-        </h1>
-
-        <p>
-          اختاري التصميم الذي يناسبك، وأرسلي طلبك بسهولة.
-          نحن هنا لمساعدتك في تحويل فكرتك إلى واقع.
-        </p>
-
+        <h1>حوّلي فكرتك إلى <span>موقع إلكتروني رائع</span></h1>
+        <p>اختاري التصميم الذي يناسبك، وأرسلي طلبك بسهولة. نحن هنا لمساعدتك في تحويل فكرتك إلى واقع.</p>
         <div class="hero-buttons">
           <a href="#templates" class="btn btn-dark">اكتشفي القوالب</a>
-          <button type="button" class="btn btn-outline" onclick="openForm()">
-            اطلبي تصميمك
-          </button>
+          <button type="button" class="btn btn-outline" onclick="openForm()">اطلبي تصميمك</button>
         </div>
-
         <div class="benefits">
           <span>✦ تصاميم عصرية</span>
           <span>✦ سهولة تقديم الطلب</span>
@@ -63,10 +47,8 @@
             <span>VELORA / PREVIEW</span>
             <span>● ● ●</span>
           </div>
-
           <div class="restaurant-preview">
             <div class="preview-top">VELORA DESIGN STUDIO</div>
-
             <div class="preview-text">
               <small>DISCOVER YOUR STYLE</small>
               <h2>Taste The Difference</h2>
@@ -74,7 +56,6 @@
             </div>
           </div>
         </div>
-
         <div class="image-caption">DESIGNED WITH VELORA</div>
       </div>
     </section>
@@ -86,18 +67,11 @@
           <h2>اختاري قالبك المفضل</h2>
           <p>تصفحي التصاميم واختاري ما يناسب مشروعك.</p>
         </div>
-
         <span id="templateCount">6 قوالب</span>
       </div>
 
       <div class="toolbar">
-        <input
-          type="search"
-          id="searchInput"
-          placeholder="ابحثي عن قالب..."
-          aria-label="البحث عن قالب"
-        >
-
+        <input type="search" id="searchInput" placeholder="ابحثي عن قالب..." aria-label="البحث عن قالب">
         <div class="filters">
           <button class="filter active" data-category="all" type="button">الكل</button>
           <button class="filter" data-category="restaurant" type="button">مطاعم</button>
@@ -107,33 +81,28 @@
           <button class="filter" data-category="business" type="button">شركات</button>
         </div>
       </div>
-
       <div class="template-grid" id="templateGrid"></div>
     </section>
 
     <section class="section how-section" id="how">
       <p class="eyebrow">خطوات بسيطة</p>
       <h2>كيف تطلبي موقعك؟</h2>
-
       <div class="steps">
         <article>
           <span>01 /</span>
           <h3>اختاري قالبك</h3>
           <p>تصفحي القوالب واختاري التصميم الأقرب لفكرتك.</p>
         </article>
-
         <article>
           <span>02 /</span>
           <h3>أرسلي التفاصيل</h3>
           <p>عبّي نموذج الطلب بمعلومات مشروعك.</p>
         </article>
-
         <article>
           <span>03 /</span>
           <h3>احفظي طلبك</h3>
           <p>سيحاول الموقع حفظ تفاصيل الطلب في قاعدة البيانات.</p>
         </article>
-
         <article>
           <span>04 /</span>
           <h3>تواصلي معنا</h3>
@@ -148,10 +117,7 @@
         <h2>خلينا نبني موقعك الخاص</h2>
         <p>احكي لنا عن مشروعك، وابدئي طلب تصميمك.</p>
       </div>
-
-      <button class="btn btn-gold" type="button" onclick="openForm()">
-        اطلبي تصميمك الآن ↗
-      </button>
+      <button class="btn btn-gold" type="button" onclick="openForm()">اطلبي تصميمك الآن ↗</button>
     </section>
   </main>
 
@@ -160,27 +126,22 @@
     <p>© 2026 Velora. جميع الحقوق محفوظة.</p>
   </footer>
 
-  <!-- نموذج الطلب -->
-  <div class="modal" id="requestModal" role="dialog"
-       aria-modal="true" aria-labelledby="requestTitle">
-
+  <div class="modal" id="requestModal" role="dialog" aria-modal="true" aria-labelledby="requestTitle">
     <div class="modal-box">
-      <button type="button" class="close" onclick="closeForm()"
-              aria-label="إغلاق">&times;</button>
-
+      <button type="button" class="close" onclick="closeForm()" aria-label="إغلاق">&times;</button>
       <h2 id="requestTitle">خلينا نصمم موقعك</h2>
       <p>عبّي معلومات مشروعك حتى نجهز طلبك.</p>
 
       <form id="requestForm">
+
+        <!-- خانة مخفية لاكتشاف بعض الروبوتات -->
+        <div aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">
+          <label for="companySite">اترك هذا الحقل فارغاً</label>
+          <input type="text" id="companySite" name="company_site_url" tabindex="-1" autocomplete="off">
+        </div>
+
         <label for="project">اسم المشروع</label>
-        <input
-          type="text"
-          id="project"
-          name="project"
-          placeholder="مثال: متجري الإلكتروني"
-          maxlength="120"
-          required
-        >
+        <input type="text" id="project" name="project" placeholder="مثال: متجري الإلكتروني" maxlength="120" required>
 
         <label for="category">نوع المشروع</label>
         <select id="category" name="category" required>
@@ -193,28 +154,12 @@
         </select>
 
         <label for="phone">رقم واتساب (اختياري)</label>
-        <input
-          type="tel"
-          id="phone"
-          name="phone"
-          placeholder="962..."
-          maxlength="40"
-        >
+        <input type="tel" id="phone" name="phone" placeholder="962..." maxlength="40">
 
         <label for="details">احكي لنا عن فكرتك</label>
-        <textarea
-          id="details"
-          name="details"
-          placeholder="شو حابة يكون موجود بموقعك؟"
-          maxlength="2000"
-          rows="4"
-          required
-        ></textarea>
+        <textarea id="details" name="details" placeholder="شو حابة يكون موجود بموقعك؟" maxlength="2000" rows="4" required></textarea>
 
-        <button type="submit" class="btn btn-dark submit-btn">
-          تجهيز طلب الموقع
-        </button>
-
+        <button type="submit" class="btn btn-dark submit-btn">تجهيز طلب الموقع</button>
         <div id="requestResult" role="status" aria-live="polite"></div>
       </form>
     </div>

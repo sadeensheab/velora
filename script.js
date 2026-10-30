@@ -1,4 +1,3 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
 import {
   getFirestore,
@@ -259,7 +258,14 @@ function applyLanguage() {
   setText("#requestTitle", t.modalTitle);
   setText(".modal-box > p", t.modalDesc);
 
-  const labels = document.querySelectorAll("#requestForm label");
+  // اختيار تسميات الحقول الظاهرة بالاعتماد على for حتى لا تتأثر بخانة مكافحة الروبوتات المخفية
+  const labels = [
+    $("#requestForm label[for='project']"),
+    $("#requestForm label[for='category']"),
+    $("#requestForm label[for='phone']"),
+    $("#requestForm label[for='details']")
+  ];
+
   [t.project, t.category, t.phone, t.details].forEach((value, i) => {
     if (labels[i]) labels[i].textContent = value;
   });

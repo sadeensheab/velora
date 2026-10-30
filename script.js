@@ -229,6 +229,7 @@ function applyLanguage() {
   setText(".section-heading .eyebrow", t.gallery);
   setText(".section-heading h2", t.choose);
   setText(".section-heading > div > p:last-child", t.galleryDesc);
+
   if (searchInput) {
     searchInput.placeholder = t.search;
     searchInput.setAttribute("aria-label", t.search);
@@ -236,12 +237,14 @@ function applyLanguage() {
 
   const filterButtons = document.querySelectorAll(".filter");
   const filterLabels = [t.all, ...t.categories];
+
   filterButtons.forEach((el, i) => {
     if (filterLabels[i]) el.textContent = filterLabels[i];
   });
 
   setText(".how-section .eyebrow", t.howEyebrow);
   setText(".how-section h2", t.howTitle);
+
   document.querySelectorAll(".steps article").forEach((el, i) => {
     el.querySelector("h3").textContent = t.steps[i][0];
     el.querySelector("p").textContent = t.steps[i][1];
@@ -300,8 +303,10 @@ function renderTemplates() {
       currentCategory === "all" || item.category === currentCategory;
 
     const searchText = [
-      item.name[language], item.title,
-      item.type[language], item.description[language]
+      item.name[language],
+      item.title,
+      item.type[language],
+      item.description[language]
     ].join(" ").toLowerCase();
 
     return categoryMatch && searchText.includes(query);
@@ -361,6 +366,10 @@ function openForm(templateId = "") {
     projectInput.value = selected.name[language];
   }
 
+  // إعادة ضبط خانة مكافحة الروبوتات عند فتح النموذج
+  const honeypotInput = $("#companySite");
+  if (honeypotInput) honeypotInput.value = "";
+
   if (requestResult) requestResult.textContent = "";
 }
 
@@ -385,7 +394,14 @@ requestForm?.addEventListener("submit", async event => {
   const category = String(form.get("category") || "").trim();
   const phone = String(form.get("phone") || "").trim();
   const details = String(form.get("details") || "").trim();
+  const honeypot = String(form.get("company_site_url") || "").trim();
   const t = text[language];
+
+  // إذا عبّى الروبوت الخانة المخفية، نوقف الإرسال
+  if (honeypot) {
+    requestResult.textContent = "";
+    return;
+  }
 
   if (!project || !category || !details) {
     requestResult.textContent = t.required;
@@ -440,6 +456,7 @@ ${details}`;
     requestResult.textContent = t.saved;
     submitButton.textContent = t.savedButton;
     window.location.href = whatsappURL;
+
   } catch (error) {
     console.error("Firebase save error:", error);
     requestResult.textContent = t.failed;

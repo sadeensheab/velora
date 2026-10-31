@@ -1,383 +1,339 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Velora | لوحة الإدارة</title>
+  <link rel="stylesheet" href="style.css">
 
   <style>
-    :root {
-      --bg: #f7f5ef;
-      --dark: #20251f;
-      --gold: #b69a61;
-      --line: #ded8ca;
-      --muted: #77756d;
-    }
-
-    * { box-sizing: border-box; }
-
     body {
-      margin: 0;
       min-height: 100vh;
-      background: var(--bg);
-      color: var(--dark);
-      font-family: Arial, sans-serif;
+      background: #f2f0e9;
     }
 
-    button, input, select { font: inherit; }
-
-    button {
-      cursor: pointer;
-      border: 0;
-      border-radius: 12px;
-      padding: 12px 18px;
-      background: var(--dark);
-      color: white;
+    .admin-container {
+      width: min(1100px, 94%);
+      margin: 35px auto;
     }
 
-    button:disabled {
-      opacity: .55;
-      cursor: wait;
-    }
-
-    .logo {
-      font: bold 34px Georgia, serif;
-      direction: ltr;
-      text-align: center;
-    }
-
-    .logo span { color: var(--gold); }
-
-    .login-wrap {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      padding: 20px;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 500px;
-      padding: 40px;
-      border: 1px solid var(--line);
-      border-radius: 22px;
-      background: white;
-      box-shadow: 0 18px 50px #20251f12;
-    }
-
-    h1 { font-size: 25px; }
-
-    .muted, .subtitle {
-      color: var(--muted);
-      line-height: 1.8;
-    }
-
-    label {
-      display: block;
-      margin: 16px 0 7px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
-    input {
-      width: 100%;
-      padding: 13px;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      background: white;
-    }
-
-    .full { width: 100%; margin-top: 20px; }
-
-    .message {
-      margin-top: 14px;
-      line-height: 1.7;
-      overflow-wrap: anywhere;
-      font-size: 14px;
-    }
-
-    .error { color: #b42318; }
-    .success { color: #24733a; }
-
-    [hidden] { display: none !important; }
-
-    .topbar {
+    .admin-header {
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      gap: 20px;
-      padding: 20px 5%;
-      background: white;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .topbar .logo {
-      font-size: 30px;
-      text-align: right;
-    }
-
-    .topbar p {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      overflow-wrap: anywhere;
-    }
-
-    .logout {
-      background: transparent;
-      color: var(--dark);
-      border: 1px solid var(--line);
-      white-space: nowrap;
-    }
-
-    main.dashboard {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 30px 20px 60px;
-    }
-
-    .heading-row {
-      display: flex;
       justify-content: space-between;
-      align-items: center;
       gap: 15px;
       flex-wrap: wrap;
-      margin-bottom: 24px;
+      margin-bottom: 25px;
     }
 
-    .heading-row h1 { margin-bottom: 5px; }
-
-    .refresh {
-      background: white;
-      color: var(--dark);
-      border: 1px solid var(--line);
+    .admin-header h1 {
+      font-size: 27px;
     }
 
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 24px;
-    }
-
-    .stat {
-      padding: 20px;
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-    }
-
-    .stat span {
-      display: block;
-      color: var(--muted);
+    .admin-header p {
+      color: #77756d;
       font-size: 13px;
-      margin-bottom: 12px;
     }
 
-    .stat strong { font-size: 27px; }
+    .admin-panel {
+      background: #fffefa;
+      border: 1px solid #ded8ca;
+      border-radius: 18px;
+      padding: 25px;
+      margin-bottom: 22px;
+    }
 
-    .toolbar {
-      display: flex;
-      gap: 12px;
+    .admin-panel h2 {
+      font-size: 20px;
       margin-bottom: 18px;
     }
 
-    .toolbar input, .toolbar select {
-      min-width: 0;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 12px;
-      background: white;
+    .login-screen {
+      width: min(420px, 92%);
+      margin: 100px auto;
+      padding: 30px;
+      background: #fffefa;
+      border: 1px solid #ded8ca;
+      border-radius: 20px;
     }
 
-    .toolbar input { flex: 1; }
-    .toolbar select { width: 190px; }
-
-    .orders {
+    .admin-field {
       display: grid;
-      gap: 16px;
+      gap: 7px;
+      margin-bottom: 15px;
     }
 
-    .order {
-      padding: 22px;
+    .admin-field label {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .admin-field input,
+    .admin-field select,
+    .admin-field textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ded8ca;
+      border-radius: 10px;
       background: white;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      min-width: 0;
+      font: 13px 'Cairo', sans-serif;
     }
 
-    .order-head {
+    .admin-field textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    .admin-message {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #a33;
+    }
+
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .stat-card {
+      padding: 18px;
+      background: #fffefa;
+      border: 1px solid #ded8ca;
+      border-radius: 15px;
+    }
+
+    .stat-card span {
+      color: #77756d;
+      font-size: 12px;
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 27px;
+      margin-top: 5px;
+    }
+
+    .admin-toolbar {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
       gap: 12px;
       flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+
+    .admin-toolbar input,
+    .admin-toolbar select {
+      padding: 10px 12px;
+      border: 1px solid #ded8ca;
+      border-radius: 10px;
+      background: white;
+      font: 12px 'Cairo', sans-serif;
+    }
+
+    .admin-table-wrap {
+      overflow-x: auto;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 13px 10px;
       border-bottom: 1px solid #eee9df;
-      padding-bottom: 15px;
-      margin-bottom: 16px;
+      text-align: right;
+      font-size: 12px;
     }
 
-    .order h2 {
-      font-size: 19px;
-      margin: 0 0 8px;
-      overflow-wrap: anywhere;
+    .admin-table th {
+      color: #77756d;
+      font-weight: 700;
     }
 
-    .order small { color: var(--muted); }
+    .status-select {
+      padding: 7px;
+      border: 1px solid #ded8ca;
+      border-radius: 8px;
+      font: 11px 'Cairo', sans-serif;
+    }
 
-    .order-details {
+    .small-btn {
+      border: 0;
+      border-radius: 8px;
+      padding: 7px 11px;
+      margin: 2px;
+      cursor: pointer;
+      font: 11px 'Cairo', sans-serif;
+    }
+
+    .edit-btn {
+      background: #e8dfca;
+      color: #20251f;
+    }
+
+    .delete-btn {
+      background: #f7e1dc;
+      color: #9c3428;
+    }
+
+    .publish-btn {
+      background: #dcebdc;
+      color: #245b2c;
+    }
+
+    .hidden-btn {
+      background: #ece9e2;
+      color: #555;
+    }
+
+    .portfolio-admin-list {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
+      gap: 12px;
     }
 
-    .detail {
-      min-width: 0;
-      line-height: 1.8;
-      overflow-wrap: anywhere;
-    }
-
-    .detail strong {
-      display: block;
-      margin-bottom: 4px;
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-    .detail p { margin: 0; white-space: pre-wrap; }
-
-    .order-actions {
+    .portfolio-admin-item {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 15px;
+      padding: 13px;
+      border: 1px solid #eee9df;
+      border-radius: 13px;
       flex-wrap: wrap;
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid #eee9df;
     }
 
-    .order-actions label {
-      margin: 0;
+    .portfolio-admin-item img {
+      width: 90px;
+      height: 65px;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #eee;
+    }
+
+    .portfolio-admin-info {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    .portfolio-admin-info strong {
+      display: block;
       font-size: 13px;
     }
 
-    .order-actions select {
-      flex: 1;
-      min-width: 150px;
-      padding: 10px;
-      border: 1px solid var(--line);
-      border-radius: 9px;
-      background: white;
+    .portfolio-admin-info span {
+      color: #77756d;
+      font-size: 11px;
     }
 
-    .delete {
-      background: #fff0ee;
-      color: #a5261b;
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 12px;
+      margin: 12px 0;
     }
 
-    .empty {
-      padding: 35px 20px;
-      text-align: center;
-      color: var(--muted);
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: 16px;
+    .check-row input {
+      width: 17px;
+      height: 17px;
     }
 
-    @media (max-width: 700px) {
-      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .order-details { grid-template-columns: 1fr; }
-      .toolbar { flex-direction: column; }
-      .toolbar select { width: 100%; }
-      .topbar { padding: 16px; }
-      .topbar .logo { font-size: 25px; }
-      .topbar p { max-width: 220px; }
-      main.dashboard { padding: 22px 14px 40px; }
-      .login-card { padding: 24px; }
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 650px) {
+      .admin-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .admin-panel {
+        padding: 17px;
+      }
     }
   </style>
 </head>
 
 <body>
 
-  <section id="loginScreen" class="login-wrap">
-    <div class="login-card">
-      <div class="logo">Velora<span>.</span></div>
-      <h1>تسجيل دخول الإدارة</h1>
-      <p class="subtitle">سجّلي الدخول بحساب المدير للوصول إلى طلبات العملاء.</p>
+  <!-- تسجيل الدخول -->
+  <section class="login-screen" id="loginScreen">
+    <a href="index.html" class="logo">Velora<span>.</span></a>
+    <h2 style="margin: 18px 0 8px;">لوحة الإدارة</h2>
+    <p style="color:#77756d;font-size:13px;margin-bottom:20px;">
+      سجّل الدخول للوصول إلى لوحة التحكم.
+    </p>
 
-      <form id="loginForm">
+    <form id="loginForm">
+      <div class="admin-field">
         <label for="email">البريد الإلكتروني</label>
         <input id="email" type="email" autocomplete="username" required>
-
-        <label for="password">كلمة المرور</label>
-        <input id="password" type="password" autocomplete="current-password" required>
-
-        <button id="loginButton" class="full" type="submit">
-          تسجيل الدخول
-        </button>
-
-        <div id="loginMessage" class="message" role="status" aria-live="polite"></div>
-      </form>
-    </div>
-  </section>
-
-  <section id="dashboardScreen" hidden>
-    <header class="topbar">
-      <div>
-        <div class="logo">Velora<span>.</span></div>
-        <p id="adminEmail"></p>
       </div>
 
-      <button id="logoutButton" class="logout" type="button">
+      <div class="admin-field">
+        <label for="password">كلمة المرور</label>
+        <input id="password" type="password" autocomplete="current-password" required>
+      </div>
+
+      <button class="btn btn-dark" type="submit" style="width:100%;">
+        تسجيل الدخول
+      </button>
+
+      <p class="admin-message" id="loginMessage"></p>
+    </form>
+  </section>
+
+  <!-- لوحة التحكم -->
+  <main class="admin-container hidden" id="dashboard">
+
+    <header class="admin-header">
+      <div>
+        <a href="index.html" class="logo">Velora<span>.</span></a>
+        <h1>لوحة التحكم</h1>
+        <p>إدارة طلبات العملاء ومشاريع أعمالنا.</p>
+      </div>
+
+      <button class="btn btn-outline" id="logoutButton" type="button">
         تسجيل الخروج
       </button>
     </header>
 
-    <main class="dashboard">
-      <div class="heading-row">
-        <div>
-          <h1>إدارة الطلبات</h1>
-          <p class="muted">تابعي طلبات تصميم المواقع من مكان واحد.</p>
-        </div>
-
-        <button id="refreshButton" class="refresh" type="button">
-          تحديث الطلبات ↻
-        </button>
+    <section class="admin-stats">
+      <div class="stat-card">
+        <span>كل الطلبات</span>
+        <strong id="totalOrders">0</strong>
       </div>
 
-      <div class="stats">
-        <div class="stat">
-          <span>كل الطلبات</span>
-          <strong id="totalCount">0</strong>
-        </div>
-
-        <div class="stat">
-          <span>طلبات جديدة</span>
-          <strong id="newCount">0</strong>
-        </div>
-
-        <div class="stat">
-          <span>قيد التنفيذ</span>
-          <strong id="progressCount">0</strong>
-        </div>
-
-        <div class="stat">
-          <span>مكتملة</span>
-          <strong id="doneCount">0</strong>
-        </div>
+      <div class="stat-card">
+        <span>طلبات جديدة</span>
+        <strong id="newOrders">0</strong>
       </div>
 
-      <div class="toolbar">
-        <input
-          id="searchOrders"
-          type="search"
-          placeholder="ابحثي باسم المشروع أو رقم التواصل..."
-          aria-label="البحث في الطلبات"
-        >
+      <div class="stat-card">
+        <span>مشاريع منشورة</span>
+        <strong id="publishedProjects">0</strong>
+      </div>
+    </section>
 
-        <select id="statusFilter" aria-label="تصفية حسب حالة الطلب">
+    <!-- الطلبات -->
+    <section class="admin-panel">
+      <h2>طلبات العملاء</h2>
+
+      <div class="admin-toolbar">
+        <input id="orderSearch" type="search" placeholder="ابحث باسم المشروع أو الهاتف">
+
+        <select id="statusFilter">
           <option value="all">كل الحالات</option>
           <option value="new">جديد</option>
           <option value="in_progress">قيد التنفيذ</option>
@@ -385,18 +341,122 @@
         </select>
       </div>
 
-      <div id="dashboardMessage" class="message" role="status" aria-live="polite"></div>
-      <div id="ordersList" class="orders"></div>
-    </main>
-  </section>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>المشروع</th>
+              <th>النوع</th>
+              <th>الهاتف</th>
+              <th>التفاصيل</th>
+              <th>الحالة</th>
+              <th>حذف</th>
+            </tr>
+          </thead>
+
+          <tbody id="ordersTable">
+            <tr>
+              <td colspan="6">جارٍ تحميل الطلبات...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="admin-message" id="ordersMessage"></p>
+    </section>
+
+    <!-- إدارة أعمالنا -->
+    <section class="admin-panel" id="portfolioManagement">
+      <h2>إدارة أعمالنا</h2>
+
+      <p style="color:#77756d;font-size:12px;line-height:2;margin-bottom:18px;">
+        أضف المواقع التي أنجزتها لعملائك. لن يظهر المشروع للزوار إلا عند نشره.
+        تأكد من حصولك على موافقة العميل قبل عرض مشروعه.
+      </p>
+
+      <button class="btn btn-dark" type="button" id="addPortfolioButton">
+        + إضافة مشروع جديد
+      </button>
+
+      <form id="portfolioForm" class="hidden" style="margin-top:22px;">
+        <input type="hidden" id="portfolioId">
+
+        <div class="admin-field">
+          <label for="portfolioTitle">اسم المشروع</label>
+          <input id="portfolioTitle" maxlength="100" required>
+        </div>
+
+        <div class="admin-field">
+          <label for="portfolioCategory">نوع المشروع</label>
+          <select id="portfolioCategory" required>
+            <option value="">اختر النوع</option>
+            <option value="مطاعم">مطاعم</option>
+            <option value="متاجر">متاجر</option>
+            <option value="شركات">شركات</option>
+            <option value="عيادات">عيادات</option>
+            <option value="عقارات">عقارات</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+
+        <div class="admin-field">
+          <label for="portfolioDescription">وصف المشروع</label>
+          <textarea id="portfolioDescription" maxlength="500" required></textarea>
+        </div>
+
+        <div class="admin-field">
+          <label for="portfolioImage">رابط صورة المشروع</label>
+          <input id="portfolioImage" type="url" placeholder="https://..." required>
+        </div>
+
+        <div class="admin-field">
+          <label for="portfolioUrl">رابط الموقع المنشور</label>
+          <input id="portfolioUrl" type="url" placeholder="https://..." required>
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" id="permissionGranted" required>
+          أؤكد أن لدي موافقة العميل على عرض هذا المشروع.
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" id="portfolioPublished">
+          نشر المشروع على الموقع العام.
+        </label>
+
+        <div class="form-actions">
+          <button class="btn btn-dark" type="submit" id="savePortfolioButton">
+            حفظ المشروع
+          </button>
+
+          <button class="btn btn-outline" type="button" id="cancelPortfolioButton">
+            إلغاء
+          </button>
+        </div>
+
+        <p class="admin-message" id="portfolioFormMessage"></p>
+      </form>
+
+      <hr style="border:0;border-top:1px solid #eee9df;margin:25px 0;">
+
+      <h3 style="font-size:16px;margin-bottom:15px;">المشاريع الحالية</h3>
+
+      <div class="portfolio-admin-list" id="portfolioAdminList">
+        جارٍ تحميل المشاريع...
+      </div>
+
+      <p class="admin-message" id="portfolioMessage"></p>
+    </section>
+
+  </main>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
 
     import {
       getAuth,
-      signInWithEmailAndPassword,
       onAuthStateChanged,
+      signInWithEmailAndPassword,
       signOut
     } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 
@@ -408,7 +468,9 @@
       orderBy,
       updateDoc,
       deleteDoc,
-      doc
+      doc,
+      addDoc,
+      serverTimestamp
     } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -421,7 +483,6 @@
       measurementId: "G-Q9CRKMTGWX"
     };
 
-    // حسابات المدراء المسموح لهم بالدخول
     const ADMIN_UIDS = [
       "WTtQENLzC4fyCxZ5pu0kV5N2Iwt2",
       "61tooPLy9bZ11bo9ZCisVkiJYvC3"
@@ -431,409 +492,414 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    const loginScreen = document.getElementById("loginScreen");
-    const dashboardScreen = document.getElementById("dashboardScreen");
-    const loginForm = document.getElementById("loginForm");
-    const loginButton = document.getElementById("loginButton");
-    const loginMessage = document.getElementById("loginMessage");
-    const dashboardMessage = document.getElementById("dashboardMessage");
-    const ordersList = document.getElementById("ordersList");
+    const $ = selector => document.querySelector(selector);
 
-    const statusLabels = {
-      new: "جديد",
-      in_progress: "قيد التنفيذ",
-      completed: "مكتمل"
-    };
-
-    const categoryLabels = {
-      business: "موقع أعمال",
-      store: "متجر إلكتروني",
-      portfolio: "معرض أعمال",
-      restaurant: "موقع مطعم",
-      other: "نوع آخر",
-      realestate: "عقارات",
-      clinic: "عيادات",
-      fashion: "متاجر"
-    };
+    const loginScreen = $("#loginScreen");
+    const dashboard = $("#dashboard");
+    const loginForm = $("#loginForm");
+    const loginMessage = $("#loginMessage");
 
     let allOrders = [];
-    let loadingOrders = false;
+    let allPortfolio = [];
 
-    function setMessage(element, text, type = "") {
-      element.textContent = text;
-      element.className = "message" + (type ? " " + type : "");
-    }
-
-    function formatDate(value) {
-      if (!value || typeof value.toDate !== "function") {
-        return "غير متوفر";
-      }
-
-      return value.toDate().toLocaleString("ar-JO", {
-        dateStyle: "medium",
-        timeStyle: "short"
-      });
-    }
-
-    function showLogin() {
-      dashboardScreen.hidden = true;
-      loginScreen.hidden = false;
-    }
-
-    function showDashboard(user) {
-      loginScreen.hidden = true;
-      dashboardScreen.hidden = false;
-      document.getElementById("adminEmail").textContent = user.email || "";
-    }
-
-    // تسجيل الدخول
-    loginForm.addEventListener("submit", async (event) => {
+    /* تسجيل الدخول */
+    loginForm.addEventListener("submit", async event => {
       event.preventDefault();
-
-      loginButton.disabled = true;
-      loginButton.textContent = "جارٍ تسجيل الدخول...";
-      setMessage(loginMessage, "");
+      loginMessage.textContent = "جارٍ تسجيل الدخول...";
 
       try {
-        const email = document.getElementById("email").value.trim();
-        const password = document.getElementById("password").value;
-
-        const credential = await signInWithEmailAndPassword(
+        await signInWithEmailAndPassword(
           auth,
-          email,
-          password
+          $("#email").value.trim(),
+          $("#password").value
         );
-
-        if (!ADMIN_UIDS.includes(credential.user.uid)) {
-          await signOut(auth);
-          setMessage(
-            loginMessage,
-            "هذا الحساب ليس مخوّلًا لإدارة الطلبات.",
-            "error"
-          );
-        }
       } catch (error) {
-        console.error("Login error:", error);
-
-        let message = "تعذّر تسجيل الدخول. تحققي من البيانات وحاولي مرة أخرى.";
-
-        if (
-          error.code === "auth/invalid-credential" ||
-          error.code === "auth/wrong-password" ||
-          error.code === "auth/user-not-found"
-        ) {
-          message = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
-        } else if (error.code === "auth/too-many-requests") {
-          message = "محاولات كثيرة. انتظري قليلًا ثم حاولي مرة أخرى.";
-        } else if (error.code === "auth/network-request-failed") {
-          message = "تحققي من اتصال الإنترنت وحاولي مرة أخرى.";
-        }
-
-        setMessage(loginMessage, message, "error");
-      } finally {
-        loginButton.disabled = false;
-        loginButton.textContent = "تسجيل الدخول";
+        console.error(error);
+        loginMessage.textContent = "تعذّر تسجيل الدخول. تأكد من البريد وكلمة المرور.";
       }
     });
 
-    // التحقق من المستخدم عند فتح لوحة الإدارة
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async user => {
       if (!user) {
-        showLogin();
+        loginScreen.classList.remove("hidden");
+        dashboard.classList.add("hidden");
         return;
       }
 
       if (!ADMIN_UIDS.includes(user.uid)) {
+        loginMessage.textContent = "هذا الحساب ليس لديه صلاحية الإدارة.";
         await signOut(auth);
-        showLogin();
-        setMessage(
-          loginMessage,
-          "هذا الحساب ليس مخوّلًا لإدارة الطلبات.",
-          "error"
-        );
         return;
       }
 
-      showDashboard(user);
+      loginScreen.classList.add("hidden");
+      dashboard.classList.remove("hidden");
+
       await loadOrders();
+      await loadPortfolio();
     });
 
-    // تسجيل الخروج
-    document.getElementById("logoutButton").addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        allOrders = [];
-        ordersList.replaceChildren();
-        setMessage(loginMessage, "تم تسجيل الخروج.", "success");
-      } catch (error) {
-        console.error(error);
-        setMessage(
-          dashboardMessage,
-          "تعذّر تسجيل الخروج. حاولي مرة أخرى.",
-          "error"
-        );
-      }
-    });
+    $("#logoutButton").addEventListener("click", () => signOut(auth));
 
-    document.getElementById("refreshButton").addEventListener("click", loadOrders);
-    document.getElementById("searchOrders").addEventListener("input", renderOrders);
-    document.getElementById("statusFilter").addEventListener("change", renderOrders);
-
-    // تحميل الطلبات
+    /* الطلبات */
     async function loadOrders() {
-      if (loadingOrders) return;
-
-      const user = auth.currentUser;
-
-      if (!user || !ADMIN_UIDS.includes(user.uid)) {
-        setMessage(
-          dashboardMessage,
-          "سجّلي الدخول بحساب المدير أولًا.",
-          "error"
-        );
-        return;
-      }
-
-      loadingOrders = true;
-      document.getElementById("refreshButton").disabled = true;
-      setMessage(dashboardMessage, "جارٍ تحميل الطلبات...");
+      const tbody = $("#ordersTable");
+      tbody.innerHTML = "<tr><td colspan='6'>جارٍ تحميل الطلبات...</td></tr>";
 
       try {
-        const ordersQuery = query(
-          collection(db, "orders"),
-          orderBy("createdAt", "desc")
+        const snapshot = await getDocs(
+          query(collection(db, "orders"), orderBy("createdAt", "desc"))
         );
 
-        const snapshot = await getDocs(ordersQuery);
-
-        allOrders = snapshot.docs.map((item) => ({
+        allOrders = snapshot.docs.map(item => ({
           id: item.id,
           ...item.data()
         }));
 
-        updateStats();
         renderOrders();
+        updateStats();
 
-        setMessage(
-          dashboardMessage,
-          allOrders.length
-            ? `تم تحميل ${allOrders.length} طلب بنجاح.`
-            : "ما في طلبات محفوظة حاليًا.",
-          "success"
-        );
       } catch (error) {
-        console.error("Load orders error:", error);
-
-        if (error.code === "permission-denied") {
-          setMessage(
-            dashboardMessage,
-            "ما عندك صلاحية لقراءة الطلبات. تأكدي من نشر قواعد Firestore ومن استخدام حساب المدير الصحيح.",
-            "error"
-          );
-        } else {
-          setMessage(
-            dashboardMessage,
-            "تعذّر تحميل الطلبات. تحققي من اتصال الإنترنت وإعدادات Firebase.",
-            "error"
-          );
-        }
-      } finally {
-        loadingOrders = false;
-        document.getElementById("refreshButton").disabled = false;
+        console.error(error);
+        tbody.innerHTML = "<tr><td colspan='6'>تعذّر تحميل الطلبات.</td></tr>";
       }
     }
 
-    // تحديث الإحصائيات
-    function updateStats() {
-      document.getElementById("totalCount").textContent = allOrders.length;
-
-      document.getElementById("newCount").textContent =
-        allOrders.filter(item => (item.status || "new") === "new").length;
-
-      document.getElementById("progressCount").textContent =
-        allOrders.filter(item => item.status === "in_progress").length;
-
-      document.getElementById("doneCount").textContent =
-        allOrders.filter(item => item.status === "completed").length;
-    }
-
-    function createDetail(label, value) {
-      const wrapper = document.createElement("div");
-      wrapper.className = "detail";
-
-      const title = document.createElement("strong");
-      title.textContent = label;
-
-      const content = document.createElement("p");
-      content.textContent = value || "غير محدد";
-
-      wrapper.append(title, content);
-      return wrapper;
-    }
-
-    // عرض الطلبات والبحث والتصفية
     function renderOrders() {
-      const search = document.getElementById("searchOrders")
-        .value.trim().toLowerCase();
+      const tbody = $("#ordersTable");
+      const search = $("#orderSearch").value.trim().toLowerCase();
+      const status = $("#statusFilter").value;
 
-      const statusFilter = document.getElementById("statusFilter").value;
-
-      const filtered = allOrders.filter((item) => {
-        const status = item.status || "new";
+      const filtered = allOrders.filter(order => {
+        const matchesSearch =
+          String(order.project || "").toLowerCase().includes(search) ||
+          String(order.phone || "").toLowerCase().includes(search);
 
         const matchesStatus =
-          statusFilter === "all" || status === statusFilter;
+          status === "all" || order.status === status;
 
-        const searchableText = [
-          item.project,
-          item.phone,
-          item.details,
-          categoryLabels[item.category] || item.category
-        ].join(" ").toLowerCase();
-
-        return matchesStatus && searchableText.includes(search);
+        return matchesSearch && matchesStatus;
       });
 
-      ordersList.replaceChildren();
-
       if (!filtered.length) {
-        const empty = document.createElement("div");
-        empty.className = "empty";
-        empty.textContent = allOrders.length
-          ? "ما لقينا طلبات مطابقة للبحث."
-          : "لسه ما في طلبات لعرضها.";
-
-        ordersList.appendChild(empty);
+        tbody.innerHTML = "<tr><td colspan='6'>لا توجد طلبات.</td></tr>";
         return;
       }
 
-      filtered.forEach((item) => {
-        const card = document.createElement("article");
-        card.className = "order";
+      tbody.innerHTML = "";
 
-        const header = document.createElement("div");
-        header.className = "order-head";
+      filtered.forEach(order => {
+        const tr = document.createElement("tr");
 
-        const titleBlock = document.createElement("div");
+        const project = document.createElement("td");
+        project.textContent = order.project || "";
 
-        const title = document.createElement("h2");
-        title.textContent = item.project || "طلب بدون اسم";
+        const category = document.createElement("td");
+        category.textContent = order.category || "";
 
-        const date = document.createElement("small");
-        date.textContent = "تاريخ الطلب: " + formatDate(item.createdAt);
+        const phone = document.createElement("td");
+        phone.textContent = order.phone || "—";
 
-        titleBlock.append(title, date);
+        const details = document.createElement("td");
+        details.textContent = order.details || "";
 
-        const statusText = document.createElement("small");
-        statusText.textContent =
-          "الحالة: " + (statusLabels[item.status || "new"] || "جديد");
-
-        header.append(titleBlock, statusText);
-
-        const details = document.createElement("div");
-        details.className = "order-details";
-
-        details.append(
-          createDetail("نوع الموقع", categoryLabels[item.category] || item.category),
-          createDetail("رقم التواصل", item.phone),
-          createDetail("تفاصيل المشروع", item.details),
-          createDetail("رقم الطلب", item.id)
-        );
-
-        const actions = document.createElement("div");
-        actions.className = "order-actions";
-
-        const statusLabel = document.createElement("label");
-        statusLabel.textContent = "تغيير الحالة:";
-
+        const statusCell = document.createElement("td");
         const select = document.createElement("select");
-        select.setAttribute("aria-label", "تغيير حالة الطلب");
+        select.className = "status-select";
 
-        Object.entries(statusLabels).forEach(([value, label]) => {
+        [
+          ["new", "جديد"],
+          ["in_progress", "قيد التنفيذ"],
+          ["completed", "مكتمل"]
+        ].forEach(([value, label]) => {
           const option = document.createElement("option");
           option.value = value;
           option.textContent = label;
           select.appendChild(option);
         });
 
-        select.value = statusLabels[item.status] ? item.status : "new";
+        select.value = order.status || "new";
 
-        // تعديل حالة الطلب
         select.addEventListener("change", async () => {
-          const newStatus = select.value;
-          select.disabled = true;
-
           try {
-            await updateDoc(doc(db, "orders", item.id), {
-              status: newStatus
+            await updateDoc(doc(db, "orders", order.id), {
+              status: select.value
             });
 
-            item.status = newStatus;
+            order.status = select.value;
             updateStats();
-            renderOrders();
-
-            setMessage(
-              dashboardMessage,
-              "تم تحديث حالة الطلب.",
-              "success"
-            );
+            $("#ordersMessage").textContent = "تم تحديث حالة الطلب.";
           } catch (error) {
-            console.error("Update order error:", error);
-            select.disabled = false;
-            select.value = item.status || "new";
-
-            setMessage(
-              dashboardMessage,
-              "تعذّر تحديث الحالة. تحققي من صلاحيات Firestore.",
-              "error"
-            );
+            console.error(error);
+            $("#ordersMessage").textContent = "تعذّر تحديث الطلب.";
           }
         });
 
-        // حذف الطلب
+        statusCell.appendChild(select);
+
+        const deleteCell = document.createElement("td");
         const deleteButton = document.createElement("button");
-        deleteButton.type = "button";
-        deleteButton.className = "delete";
-        deleteButton.textContent = "حذف الطلب";
+        deleteButton.className = "small-btn delete-btn";
+        deleteButton.textContent = "حذف";
 
         deleteButton.addEventListener("click", async () => {
-          const confirmed = window.confirm(
-            `هل أنتِ متأكدة من حذف طلب "${item.project || "بدون اسم"}"؟ لا يمكن التراجع عن الحذف.`
-          );
-
-          if (!confirmed) return;
-
-          deleteButton.disabled = true;
+          if (!confirm("هل أنت متأكد من حذف هذا الطلب؟")) return;
 
           try {
-            await deleteDoc(doc(db, "orders", item.id));
-
-            allOrders = allOrders.filter(order => order.id !== item.id);
-            updateStats();
+            await deleteDoc(doc(db, "orders", order.id));
+            allOrders = allOrders.filter(item => item.id !== order.id);
             renderOrders();
-
-            setMessage(
-              dashboardMessage,
-              "تم حذف الطلب.",
-              "success"
-            );
+            updateStats();
+            $("#ordersMessage").textContent = "تم حذف الطلب.";
           } catch (error) {
-            console.error("Delete order error:", error);
-            deleteButton.disabled = false;
-
-            setMessage(
-              dashboardMessage,
-              "تعذّر حذف الطلب. تحققي من صلاحيات Firestore.",
-              "error"
-            );
+            console.error(error);
+            $("#ordersMessage").textContent = "تعذّر حذف الطلب.";
           }
         });
 
-        actions.append(statusLabel, select, deleteButton);
-        card.append(header, details, actions);
-        ordersList.appendChild(card);
+        deleteCell.appendChild(deleteButton);
+
+        tr.append(
+          project,
+          category,
+          phone,
+          details,
+          statusCell,
+          deleteCell
+        );
+
+        tbody.appendChild(tr);
       });
     }
+
+    $("#orderSearch").addEventListener("input", renderOrders);
+    $("#statusFilter").addEventListener("change", renderOrders);
+
+    function updateStats() {
+      $("#totalOrders").textContent = allOrders.length;
+      $("#newOrders").textContent =
+        allOrders.filter(order => order.status === "new").length;
+
+      $("#publishedProjects").textContent =
+        allPortfolio.filter(project => project.published === true).length;
+    }
+
+    /* إدارة أعمالنا */
+    const portfolioForm = $("#portfolioForm");
+
+    $("#addPortfolioButton").addEventListener("click", () => {
+      resetPortfolioForm();
+      portfolioForm.classList.remove("hidden");
+      $("#portfolioTitle").focus();
+    });
+
+    $("#cancelPortfolioButton").addEventListener("click", () => {
+      resetPortfolioForm();
+    });
+
+    function resetPortfolioForm() {
+      portfolioForm.reset();
+      $("#portfolioId").value = "";
+      $("#portfolioFormMessage").textContent = "";
+      portfolioForm.classList.add("hidden");
+      $("#permissionGranted").checked = false;
+    }
+
+    async function loadPortfolio() {
+      const list = $("#portfolioAdminList");
+      list.textContent = "جارٍ تحميل المشاريع...";
+
+      try {
+        const snapshot = await getDocs(
+          query(collection(db, "portfolio"), orderBy("createdAt", "desc"))
+        );
+
+        allPortfolio = snapshot.docs.map(item => ({
+          id: item.id,
+          ...item.data()
+        }));
+
+        renderPortfolioAdmin();
+        updateStats();
+
+      } catch (error) {
+        console.error(error);
+        list.textContent = "تعذّر تحميل المشاريع.";
+      }
+    }
+
+    function renderPortfolioAdmin() {
+      const list = $("#portfolioAdminList");
+      list.innerHTML = "";
+
+      if (!allPortfolio.length) {
+        list.textContent = "لا توجد مشاريع مضافة حتى الآن.";
+        return;
+      }
+
+      allPortfolio.forEach(project => {
+        const item = document.createElement("div");
+        item.className = "portfolio-admin-item";
+
+        const image = document.createElement("img");
+        image.src = project.imageUrl || "";
+        image.alt = project.title || "Project";
+        image.referrerPolicy = "no-referrer";
+
+        const info = document.createElement("div");
+        info.className = "portfolio-admin-info";
+
+        const title = document.createElement("strong");
+        title.textContent = project.title || "";
+
+        const status = document.createElement("span");
+        status.textContent = project.published ? "منشور" : "مخفي";
+
+        info.append(title, status);
+
+        const edit = document.createElement("button");
+        edit.className = "small-btn edit-btn";
+        edit.textContent = "تعديل";
+
+        edit.addEventListener("click", () => editPortfolio(project));
+
+        const toggle = document.createElement("button");
+        toggle.className = `small-btn ${project.published ? "hidden-btn" : "publish-btn"}`;
+        toggle.textContent = project.published ? "إخفاء" : "نشر";
+
+        toggle.addEventListener("click", () => togglePortfolio(project));
+
+        const remove = document.createElement("button");
+        remove.className = "small-btn delete-btn";
+        remove.textContent = "حذف";
+
+        remove.addEventListener("click", () => deletePortfolio(project));
+
+        item.append(image, info, edit, toggle, remove);
+        list.appendChild(item);
+      });
+    }
+
+    function editPortfolio(project) {
+      $("#portfolioId").value = project.id;
+      $("#portfolioTitle").value = project.title || "";
+      $("#portfolioCategory").value = project.category || "";
+      $("#portfolioDescription").value = project.description || "";
+      $("#portfolioImage").value = project.imageUrl || "";
+      $("#portfolioUrl").value = project.url || "";
+      $("#permissionGranted").checked = project.permissionGranted === true;
+      $("#portfolioPublished").checked = project.published === true;
+
+      portfolioForm.classList.remove("hidden");
+      $("#portfolioFormMessage").textContent = "";
+      $("#portfolioTitle").focus();
+    }
+
+    function validWebUrl(value) {
+      try {
+        const url = new URL(value);
+        return url.protocol === "https:";
+      } catch {
+        return false;
+      }
+    }
+
+    portfolioForm.addEventListener("submit", async event => {
+      event.preventDefault();
+
+      const id = $("#portfolioId").value;
+      const title = $("#portfolioTitle").value.trim();
+      const category = $("#portfolioCategory").value;
+      const description = $("#portfolioDescription").value.trim();
+      const imageUrl = $("#portfolioImage").value.trim();
+      const url = $("#portfolioUrl").value.trim();
+      const permissionGranted = $("#permissionGranted").checked;
+      const published = $("#portfolioPublished").checked;
+
+      const message = $("#portfolioFormMessage");
+      const saveButton = $("#savePortfolioButton");
+
+      if (!permissionGranted) {
+        message.textContent = "أكد موافقة العميل قبل الحفظ.";
+        return;
+      }
+
+      if (!validWebUrl(imageUrl) || !validWebUrl(url)) {
+        message.textContent = "روابط الصورة والموقع لازم تبدأ بـ https://";
+        return;
+      }
+
+      if (!title || !category || !description) {
+        message.textContent = "يرجى تعبئة جميع الحقول.";
+        return;
+      }
+
+      saveButton.disabled = true;
+      message.textContent = "جارٍ حفظ المشروع...";
+
+      const projectData = {
+        title,
+        category,
+        description,
+        imageUrl,
+        url,
+        permissionGranted,
+        published,
+        updatedAt: serverTimestamp()
+      };
+
+      try {
+        if (id) {
+          await updateDoc(doc(db, "portfolio", id), projectData);
+        } else {
+          await addDoc(collection(db, "portfolio"), {
+            ...projectData,
+            createdAt: serverTimestamp()
+          });
+        }
+
+        message.textContent = "تم حفظ المشروع بنجاح.";
+        await loadPortfolio();
+        resetPortfolioForm();
+
+      } catch (error) {
+        console.error(error);
+        message.textContent = "تعذّر حفظ المشروع. تأكد من نشر قواعد Firestore الجديدة.";
+      } finally {
+        saveButton.disabled = false;
+      }
+    });
+
+    async function togglePortfolio(project) {
+      try {
+        await updateDoc(doc(db, "portfolio", project.id), {
+          published: !project.published,
+          updatedAt: serverTimestamp()
+        });
+
+        await loadPortfolio();
+        $("#portfolioMessage").textContent = "تم تحديث حالة النشر.";
+      } catch (error) {
+        console.error(error);
+        $("#portfolioMessage").textContent = "تعذّر تغيير حالة النشر.";
+      }
+    }
+
+    async function deletePortfolio(project) {
+      if (!confirm(`هل تريد حذف مشروع "${project.title}" نهائياً؟`)) return;
+
+      try {
+        await deleteDoc(doc(db, "portfolio", project.id));
+        allPortfolio = allPortfolio.filter(item => item.id !== project.id);
+        renderPortfolioAdmin();
+        updateStats();
+        $("#portfolioMessage").textContent = "تم حذف المشروع.";
+      } catch (error) {
+        console.error(error);
+        $("#portfolioMessage").textContent = "تعذّر حذف المشروع.";
+      }
+    }
   </script>
+
 </body>
 </html>

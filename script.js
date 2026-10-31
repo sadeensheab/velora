@@ -1,9 +1,13 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
+
 import {
   getFirestore,
   collection,
   addDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
@@ -25,7 +29,8 @@ let currentCategory = "all";
 
 const templates = [
   {
-    id: 1, category: "restaurant",
+    id: 1,
+    category: "restaurant",
     type: { ar: "مطاعم", en: "Restaurants" },
     name: { ar: "مطعم لونا", en: "Luna Restaurant" },
     title: "Taste The Difference",
@@ -36,7 +41,8 @@ const templates = [
     image: "photo-1414235077428-338989a2e8c0"
   },
   {
-    id: 2, category: "realestate",
+    id: 2,
+    category: "realestate",
     type: { ar: "عقارات", en: "Real Estate" },
     name: { ar: "فيستا للعقارات", en: "Vista Real Estate" },
     title: "Modern Living Spaces",
@@ -47,7 +53,8 @@ const templates = [
     image: "photo-1600210492486-724fe5c67fb0"
   },
   {
-    id: 3, category: "clinic",
+    id: 3,
+    category: "clinic",
     type: { ar: "عيادات", en: "Clinics" },
     name: { ar: "عيادة نورا", en: "Nora Clinic" },
     title: "Your Health, Our Priority",
@@ -58,7 +65,8 @@ const templates = [
     image: "photo-1629909613654-28e377c37b09"
   },
   {
-    id: 4, category: "fashion",
+    id: 4,
+    category: "fashion",
     type: { ar: "متاجر", en: "Fashion" },
     name: { ar: "دار أورا", en: "Aura Boutique" },
     title: "Wear Your Story",
@@ -69,7 +77,8 @@ const templates = [
     image: "photo-1483985988355-763728e1935b"
   },
   {
-    id: 5, category: "business",
+    id: 5,
+    category: "business",
     type: { ar: "شركات", en: "Business" },
     name: { ar: "أطلس للأعمال", en: "Atlas Business" },
     title: "Ideas Into Impact",
@@ -80,7 +89,8 @@ const templates = [
     image: "photo-1486406146926-c627a92ad1ab"
   },
   {
-    id: 6, category: "business",
+    id: 6,
+    category: "business",
     type: { ar: "شركات", en: "Business" },
     name: { ar: "ستوديو الإبداع", en: "Creative Studio" },
     title: "Made With Intention",
@@ -92,7 +102,8 @@ const templates = [
   }
 ];
 
-const $ = (selector) => document.querySelector(selector);
+const $ = selector => document.querySelector(selector);
+
 const grid = $("#templateGrid");
 const searchInput = $("#searchInput");
 const count = $("#templateCount");
@@ -100,9 +111,12 @@ const modal = $("#requestModal");
 const requestForm = $("#requestForm");
 const requestResult = $("#requestResult");
 
+const portfolioGrid = $("#portfolioGrid");
+const portfolioCount = $("#portfolioCount");
+
 const text = {
   ar: {
-    nav: ["الرئيسية", "القوالب", "تواصل معنا"],
+    nav: ["الرئيسية", "القوالب", "أعمالنا", "تواصل معنا"],
     eyebrow: "أفكارك تستحق موقعًا مميزًا",
     heroTitle: 'حوّلي فكرتك إلى <span>موقع إلكتروني رائع</span>',
     heroDesc: "اختاري التصميم الذي يناسبك، وأرسلي طلبك بسهولة. نحن هنا لمساعدتك في تحويل فكرتك إلى واقع.",
@@ -150,10 +164,16 @@ const text = {
     invalidLength: "تأكدي من طول البيانات: اسم المشروع حتى 120 حرفًا، رقم الهاتف حتى 40 حرفًا، والتفاصيل حتى 2000 حرف.",
     retry: "إعادة المحاولة",
     savedButton: "تم حفظ الطلب",
-    count: (n) => `${n} قوالب`
+    count: n => `${n} قوالب`,
+    portfolioLoading: "جارٍ تحميل أعمالنا...",
+    portfolioEmpty: "لسه ما أضفنا مشاريع إلى معرض أعمالنا.",
+    portfolioError: "تعذّر تحميل أعمالنا حاليًا. حاولي مرة ثانية لاحقًا.",
+    viewProject: "شاهدي الموقع",
+    portfolioCount: n => `${n} مشاريع`
   },
+
   en: {
-    nav: ["Home", "Templates", "Contact Us"],
+    nav: ["Home", "Templates", "Our Work", "Contact Us"],
     eyebrow: "Your ideas deserve a remarkable website",
     heroTitle: 'Turn your idea into a <span>beautiful website</span>',
     heroDesc: "Choose a design that suits you and submit your request with ease. We're here to bring your idea to life.",
@@ -201,27 +221,34 @@ const text = {
     invalidLength: "Please check the field lengths: project name up to 120 characters, phone up to 40, and details up to 2000.",
     retry: "Try Again",
     savedButton: "Request Saved",
-    count: (n) => `${n} templates`
+    count: n => `${n} templates`,
+    portfolioLoading: "Loading our work...",
+    portfolioEmpty: "No projects have been added to our portfolio yet.",
+    portfolioError: "Could not load our work right now. Please try again later.",
+    viewProject: "View Website",
+    portfolioCount: n => `${n} projects`
   }
 };
 
 function setText(selector, value, html = false) {
   const element = $(selector);
-  if (element) {
-    if (html) element.innerHTML = value;
-    else element.textContent = value;
-  }
+
+  if (!element) return;
+
+  if (html) element.innerHTML = value;
+  else element.textContent = value;
 }
 
 function applyLanguage() {
   const t = text[language];
+
   document.documentElement.lang = language;
   document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
 
   setText(".nav-actions button", language === "ar" ? "English" : "العربية");
 
-  document.querySelectorAll("nav a").forEach((el, i) => {
-    el.textContent = t.nav[i];
+  document.querySelectorAll("nav a").forEach((element, index) => {
+    if (t.nav[index]) element.textContent = t.nav[index];
   });
 
   setText(".hero-content .eyebrow", t.eyebrow);
@@ -230,8 +257,8 @@ function applyLanguage() {
   setText(".hero-buttons a", t.explore);
   setText(".hero-buttons button", t.order);
 
-  document.querySelectorAll(".benefits span").forEach((el, i) => {
-    el.textContent = t.benefits[i];
+  document.querySelectorAll(".benefits span").forEach((element, index) => {
+    if (t.benefits[index]) element.textContent = t.benefits[index];
   });
 
   setText(".section-heading .eyebrow", t.gallery);
@@ -246,16 +273,30 @@ function applyLanguage() {
   const filterButtons = document.querySelectorAll(".filter");
   const filterLabels = [t.all, ...t.categories];
 
-  filterButtons.forEach((el, i) => {
-    if (filterLabels[i]) el.textContent = filterLabels[i];
+  filterButtons.forEach((element, index) => {
+    if (filterLabels[index]) element.textContent = filterLabels[index];
   });
+
+  setText("#portfolioEyebrow", language === "ar" ? "من أعمالنا" : "OUR WORK");
+  setText("#portfolioTitle", language === "ar" ? "مشاريع نفخر بتنفيذها" : "Projects We're Proud Of");
+  setText(
+    "#portfolioDescription",
+    language === "ar"
+      ? "نماذج من مواقع صممناها لعملائنا وحوّلنا أفكارهم إلى تجارب رقمية."
+      : "A selection of websites we've created for our clients."
+  );
 
   setText(".how-section .eyebrow", t.howEyebrow);
   setText(".how-section h2", t.howTitle);
 
-  document.querySelectorAll(".steps article").forEach((el, i) => {
-    el.querySelector("h3").textContent = t.steps[i][0];
-    el.querySelector("p").textContent = t.steps[i][1];
+  document.querySelectorAll(".steps article").forEach((element, index) => {
+    const heading = element.querySelector("h3");
+    const paragraph = element.querySelector("p");
+
+    if (heading && paragraph && t.steps[index]) {
+      heading.textContent = t.steps[index][0];
+      paragraph.textContent = t.steps[index][1];
+    }
   });
 
   setText(".contact .eyebrow", t.contactEyebrow);
@@ -267,7 +308,6 @@ function applyLanguage() {
   setText("#requestTitle", t.modalTitle);
   setText(".modal-box > p", t.modalDesc);
 
-  // اختيار تسميات الحقول الظاهرة حتى لا تتأثر بخانة مكافحة الروبوتات المخفية
   const labels = [
     $("#requestForm label[for='project']"),
     $("#requestForm label[for='category']"),
@@ -275,8 +315,8 @@ function applyLanguage() {
     $("#requestForm label[for='details']")
   ];
 
-  [t.project, t.category, t.phone, t.details].forEach((value, i) => {
-    if (labels[i]) labels[i].textContent = value;
+  [t.project, t.category, t.phone, t.details].forEach((value, index) => {
+    if (labels[index]) labels[index].textContent = value;
   });
 
   const projectInput = $("#project");
@@ -291,17 +331,21 @@ function applyLanguage() {
   if (categorySelect) {
     categorySelect.options[0].textContent = t.chooseCategory;
 
-    t.options.forEach((value, i) => {
-      if (categorySelect.options[i + 1]) {
-        categorySelect.options[i + 1].textContent = value;
+    t.options.forEach((value, index) => {
+      if (categorySelect.options[index + 1]) {
+        categorySelect.options[index + 1].textContent = value;
       }
     });
   }
 
   const submit = requestForm?.querySelector('button[type="submit"]');
-  if (submit && !submit.disabled) submit.textContent = t.submit;
+
+  if (submit && !submit.disabled) {
+    submit.textContent = t.submit;
+  }
 
   renderTemplates();
+  renderPortfolio(portfolioProjects);
 }
 
 window.toggleLanguage = function () {
@@ -309,10 +353,11 @@ window.toggleLanguage = function () {
   applyLanguage();
 };
 
+/* قوالب الموقع */
 function renderTemplates() {
   if (!grid || !searchInput || !count) return;
 
-  const query = searchInput.value.trim().toLowerCase();
+  const queryText = searchInput.value.trim().toLowerCase();
 
   const filtered = templates.filter(item => {
     const categoryMatch =
@@ -325,13 +370,13 @@ function renderTemplates() {
       item.description[language]
     ].join(" ").toLowerCase();
 
-    return categoryMatch && searchText.includes(query);
+    return categoryMatch && searchText.includes(queryText);
   });
 
   count.textContent = text[language].count(filtered.length);
 
   if (filtered.length === 0) {
-    grid.innerHTML = `<p>${text[language].noResults}</p>`;
+    grid.textContent = text[language].noResults;
     return;
   }
 
@@ -343,10 +388,12 @@ function renderTemplates() {
         <span class="card-number">VELORA / ${String(item.id).padStart(2, "0")}</span>
         <h3>${item.title}</h3>
       </div>
+
       <div class="card-body">
         <span class="card-category">${item.type[language]}</span>
         <h4>${item.name[language]}</h4>
         <p>${item.description[language]}</p>
+
         <div class="card-actions">
           <button type="button" class="btn btn-dark" data-template-id="${item.id}">
             ${text[language].requestTemplate}
@@ -357,7 +404,9 @@ function renderTemplates() {
   `).join("");
 
   grid.querySelectorAll("[data-template-id]").forEach(button => {
-    button.addEventListener("click", () => openForm(button.dataset.templateId));
+    button.addEventListener("click", () => {
+      openForm(button.dataset.templateId);
+    });
   });
 }
 
@@ -365,6 +414,7 @@ document.querySelectorAll(".filter").forEach(button => {
   button.addEventListener("click", () => {
     $(".filter.active")?.classList.remove("active");
     button.classList.add("active");
+
     currentCategory = button.dataset.category;
     renderTemplates();
   });
@@ -372,6 +422,108 @@ document.querySelectorAll(".filter").forEach(button => {
 
 searchInput?.addEventListener("input", renderTemplates);
 
+/* قسم أعمالنا */
+let portfolioProjects = [];
+
+function renderPortfolio(projects) {
+  if (!portfolioGrid) return;
+
+  const t = text[language];
+
+  if (!projects || projects.length === 0) {
+    portfolioGrid.innerHTML = "";
+    const empty = document.createElement("p");
+    empty.className = "portfolio-state";
+    empty.textContent = t.portfolioEmpty;
+    portfolioGrid.appendChild(empty);
+
+    if (portfolioCount) portfolioCount.textContent = t.portfolioCount(0);
+    return;
+  }
+
+  portfolioGrid.innerHTML = "";
+
+  projects.forEach(project => {
+    const article = document.createElement("article");
+    article.className = "portfolio-card";
+
+    const imageBox = document.createElement("div");
+    imageBox.className = "portfolio-image";
+
+    const image = document.createElement("img");
+    image.src = project.imageUrl;
+    image.alt = project.title || "Velora project";
+    image.loading = "lazy";
+    image.referrerPolicy = "no-referrer";
+
+    image.addEventListener("error", () => {
+      imageBox.style.display = "none";
+    });
+
+    imageBox.appendChild(image);
+
+    const tag = document.createElement("span");
+    tag.className = "portfolio-tag";
+    tag.textContent = project.category || "Website";
+    imageBox.appendChild(tag);
+
+    const body = document.createElement("div");
+    body.className = "portfolio-body";
+
+    const title = document.createElement("h3");
+    title.textContent = project.title || "";
+
+    const description = document.createElement("p");
+    description.textContent = project.description || "";
+
+    const link = document.createElement("a");
+    link.className = "portfolio-link";
+    link.href = project.url;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = `${t.viewProject} ↗`;
+
+    body.append(title, description, link);
+    article.append(imageBox, body);
+    portfolioGrid.appendChild(article);
+  });
+
+  if (portfolioCount) {
+    portfolioCount.textContent = t.portfolioCount(projects.length);
+  }
+}
+
+async function loadPortfolio() {
+  if (!portfolioGrid) return;
+
+  try {
+    const portfolioQuery = query(
+      collection(db, "portfolio"),
+      where("published", "==", true),
+      orderBy("createdAt", "desc")
+    );
+
+    const snapshot = await getDocs(portfolioQuery);
+
+    portfolioProjects = snapshot.docs.map(document => ({
+      id: document.id,
+      ...document.data()
+    }));
+
+    renderPortfolio(portfolioProjects);
+  } catch (error) {
+    console.error("Portfolio loading error:", error);
+
+    portfolioGrid.innerHTML = "";
+
+    const message = document.createElement("p");
+    message.className = "portfolio-state";
+    message.textContent = text[language].portfolioError;
+    portfolioGrid.appendChild(message);
+  }
+}
+
+/* نموذج الطلب */
 function openForm(templateId = "") {
   modal?.classList.add("show");
 
@@ -382,8 +534,8 @@ function openForm(templateId = "") {
     projectInput.value = selected.name[language];
   }
 
-  // إعادة ضبط خانة مكافحة الروبوتات عند فتح النموذج
   const honeypotInput = $("#companySite");
+
   if (honeypotInput) honeypotInput.value = "";
 
   if (requestResult) requestResult.textContent = "";
@@ -413,7 +565,6 @@ requestForm?.addEventListener("submit", async event => {
   const honeypot = String(form.get("company_site_url") || "").trim();
   const t = text[language];
 
-  // إذا عبّى الروبوت الخانة المخفية، نوقف الإرسال
   if (honeypot) {
     requestResult.textContent = "";
     return;
@@ -424,8 +575,13 @@ requestForm?.addEventListener("submit", async event => {
     return;
   }
 
-  // مطابقة حدود البيانات مع قواعد Firestore
-  const allowedCategories = ["business", "store", "portfolio", "restaurant", "other"];
+  const allowedCategories = [
+    "business",
+    "store",
+    "portfolio",
+    "restaurant",
+    "other"
+  ];
 
   if (
     project.length > 120 ||
@@ -437,7 +593,6 @@ requestForm?.addEventListener("submit", async event => {
     return;
   }
 
-  // حد بسيط: انتظار 60 ثانية بين الطلبات الناجحة من نفس المتصفح
   const cooldownKey = "velora_last_successful_order";
   const cooldownMs = 60 * 1000;
   let lastOrderTime = 0;
@@ -501,7 +656,6 @@ ${details}`;
       createdAt: serverTimestamp()
     });
 
-    // تسجيل وقت نجاح الطلب حتى نمنع الإرسال المتكرر السريع من نفس المتصفح
     try {
       localStorage.setItem(cooldownKey, String(Date.now()));
     } catch (error) {
@@ -520,4 +674,6 @@ ${details}`;
   }
 });
 
+/* بدء تشغيل الموقع */
 applyLanguage();
+loadPortfolio();
